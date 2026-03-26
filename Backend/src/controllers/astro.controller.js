@@ -1,0 +1,126 @@
+const BirthDetails = require("../models/birth.model");
+const { generateAstroReading } = require("../services/gemini.service");
+
+const generatePrediction = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const birth = await BirthDetails.findOne({ userId });
+
+    if (!birth) {
+      return res.status(404).json({
+        message: "Birth details not found. Please save your birth details first.",
+      });
+    }
+
+    const { name, dob, tob, place } = birth;
+
+    const prompt = `
+You are AIstro, a professional Vedic astrologer and modern life guide.
+
+Analyze the user's birth details and generate a complete astrology report.
+
+IMPORTANT RULES:
+- Output MUST be valid JSON only
+- No markdown
+- No extra explanation
+- Use practical and positive language
+
+INPUT:
+{
+  "name": "${name}",
+  "date_of_birth": "${dob}",
+  "time_of_birth": "${tob}",
+  "place_of_birth": "${place}"
+}
+
+OUTPUT FORMAT:
+{
+  "quick_summary": {
+    "personality": "",
+    "strength": "",
+    "relationship_style": "",
+    "career_direction": "",
+    "next_30_days_highlight": ""
+  },
+  "personality_and_mindset": {
+    "nature": "",
+    "emotional_pattern": "",
+    "communication_style": "",
+    "stress_handling": ""
+  },
+  "strengths_and_weaknesses": {
+    "strengths": ["", "", "", "", ""],
+    "weaknesses": ["", "", "", "", ""]
+  },
+  "love_and_relationships": {
+    "partner_type": "",
+    "relationship_pattern": "",
+    "marriage_timing_hint": "",
+    "red_flags": ""
+  },
+  "career_and_education": {
+    "best_fields": ["", "", ""],
+    "job_or_business": "",
+    "skill_recommendations": ["", "", ""],
+    "growth_periods": ""
+  },
+  "money_and_wealth": {
+    "earning_style": "",
+    "spending_pattern": "",
+    "wealth_growth_timeline": ""
+  },
+  "health_and_lifestyle": {
+    "weak_areas": ["", ""],
+    "lifestyle_advice": ["", "", ""]
+  },
+  "current_transits": {
+    "planetary_influence": "",
+    "focus_now": "",
+    "avoid_now": ""
+  },
+  "forecast": {
+    "next_7_days": "",
+    "next_30_days": "",
+    "next_6_months": ""
+  },
+  "remedies": {
+    "daily_habits": ["", "", ""],
+    "mantra": "",
+    "donation_or_service": "",
+    "mindset_remedy": ""
+  },
+  "lucky_factors": {
+    "lucky_day": "",
+    "lucky_color": "",
+    "lucky_number": "",
+    "lucky_direction": ""
+  },
+  "final_guidance": ["", "", ""]
+}
+
+Return only valid JSON.
+`;
+
+    const aiResponse = await generateAstroReading(prompt);
+
+    const cleanText = aiResponse
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
+
+    const parsedData = JSON.parse(cleanText);
+
+    res.json({
+      message: "Astrology prediction generated",
+      data: parsedData,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to generate astrology prediction",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = { generatePrediction };
