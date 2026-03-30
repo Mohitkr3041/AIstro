@@ -12,6 +12,11 @@ const PORT = 5000;
 
 console.log("Starting AIstro Backend... 🚀");
 
+app.use(cors({
+  origin: "https://a-istro.vercel.app",
+  credentials: true
+}));
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
