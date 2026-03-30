@@ -1,8 +1,8 @@
 import axios from "axios";
 
-const api = axios.create({
+const API = axios.create({
   baseURL: "https://aistro-01sa.onrender.com",
-  withCredentials: true
+  withCredentials: true,
 });
 
-export default api;
+export default API;
