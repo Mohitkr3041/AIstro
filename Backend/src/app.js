@@ -10,6 +10,8 @@ const chatRoutes = require("./routes/chat.route");
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 app.use(cookieParser());
 
 
@@ -25,6 +27,8 @@ app.use(express.json());
 app.get("/", (req, res) => {
     res.send("AIstro Backend Running 🚀");
 });
+
+
 
 app.use("/astro", astroRoutes);
 app.use("/auth", authRoutes);
