@@ -13,7 +13,7 @@ const app = express();
 app.use(cookieParser());
 
 
-const cors = require("cors");
+
 
 app.use(cors({
   origin: "https://a-istro.vercel.app",
