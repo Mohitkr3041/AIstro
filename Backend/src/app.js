@@ -13,11 +13,11 @@ const app = express();
 app.use(cookieParser());
 
 
+const cors = require("cors");
+
 app.use(cors({
-    origin:[ "http://localhost:5173",
-    "https://a-istro.vercel.app/"
-     ],
-    credentials: true
+  origin: "https://a-istro.vercel.app",
+  credentials: true
 }));
 app.use(express.json());
 
