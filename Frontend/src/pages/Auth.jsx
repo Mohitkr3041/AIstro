@@ -1,6 +1,7 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { getBirthDetails } from "../services/birth.service";
+import { loginUser, registerUser } from "../services/auth.service";
 
 function Auth() {
   const navigate = useNavigate();
@@ -23,13 +24,12 @@ function Auth() {
     e.preventDefault();
 
     try {
-      const url = isLogin
-        ? "http://localhost:5000/auth/login"
-        : "http://localhost:5000/auth/register";
-
-      const res = await axios.post(url, formData, {
-        withCredentials: true,
-      });
+      const res = isLogin
+        ? await loginUser({
+            email: formData.email,
+            password: formData.password,
+          })
+        : await registerUser(formData);
 
       alert(res.data.message);
 
@@ -43,9 +43,7 @@ function Auth() {
         return;
       }
 
-      const birthRes = await axios.get("http://localhost:5000/birth/me", {
-        withCredentials: true,
-      });
+      const birthRes = await getBirthDetails();
 
       if (birthRes.data.data) {
         navigate("/dashboard");

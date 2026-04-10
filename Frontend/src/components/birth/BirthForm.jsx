@@ -1,6 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { saveBirthDetails } from "../../services/birth.service";
 
 function BirthForm() {
   const navigate = useNavigate();
@@ -27,11 +27,7 @@ function BirthForm() {
     try {
       setLoading(true);
 
-      const res = await axios.post(
-        "http://localhost:5000/birth/save",
-        formData,
-        { withCredentials: true }
-      );
+      const res = await saveBirthDetails(formData);
 
       alert(res.data.message);
       navigate("/dashboard");

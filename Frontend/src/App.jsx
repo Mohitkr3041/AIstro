@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import Auth from "./pages/Auth";
 import BirthDetails from "./pages/BirthDetails";
 import Dashboard from "./pages/Dashboard";
@@ -10,17 +10,32 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
 
   useEffect(() => {
-    checkAuth();
-  }, []);
+    let isMounted = true;
 
-  const checkAuth = async () => {
-    try {
-      await getBirthDetails();
-      setIsAuthenticated(true);
-    } catch (error) {
-      setIsAuthenticated(false);
-    }
-  };
+    getBirthDetails()
+      .then(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        startTransition(() => {
+          setIsAuthenticated(true);
+        });
+      })
+      .catch(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        startTransition(() => {
+          setIsAuthenticated(false);
+        });
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <BrowserRouter>

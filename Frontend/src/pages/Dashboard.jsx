@@ -14,27 +14,27 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
   const [loadingReport, setLoadingReport] = useState(false);
 
   useEffect(() => {
-    fetchBirthDetails();
-  }, []);
+    const fetchBirthDetails = async () => {
+      try {
+        const res = await getBirthDetails();
+        const data = res.data.data;
 
-  const fetchBirthDetails = async () => {
-    try {
-      const res = await getBirthDetails();
-      const data = res.data.data;
+        if (!data) {
+          navigate("/birth");
+          return;
+        }
 
-      if (!data) {
-        navigate("/birth");
-        return;
+        setBirthData(data);
+        generateReportData();
+      } catch (error) {
+        alert(error.response?.data?.message || "Failed to fetch birth details");
+      } finally {
+        setLoadingBirth(false);
       }
+    };
 
-      setBirthData(data);
-      generateReportData();
-    } catch (error) {
-      alert(error.response?.data?.message || "Failed to fetch birth details");
-    } finally {
-      setLoadingBirth(false);
-    }
-  };
+    fetchBirthDetails();
+  }, [navigate]);
 
   const generateReportData = async () => {
     try {
