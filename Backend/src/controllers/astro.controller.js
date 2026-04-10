@@ -1,6 +1,24 @@
 const BirthDetails = require("../models/birth.model");
 const { generateAstroReading } = require("../services/gemini.service");
 
+const extractJsonObject = (text) => {
+  const cleanedText = text.replace(/```json/g, "").replace(/```/g, "").trim();
+
+  try {
+    return JSON.parse(cleanedText);
+  } catch {
+    const firstBrace = cleanedText.indexOf("{");
+    const lastBrace = cleanedText.lastIndexOf("}");
+
+    if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) {
+      throw new Error("Model did not return a valid JSON object");
+    }
+
+    const jsonSlice = cleanedText.slice(firstBrace, lastBrace + 1);
+    return JSON.parse(jsonSlice);
+  }
+};
+
 const generatePrediction = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -103,13 +121,7 @@ Return only valid JSON.
 `;
 
     const aiResponse = await generateAstroReading(prompt);
-
-    const cleanText = aiResponse
-      .replace(/```json/g, "")
-      .replace(/```/g, "")
-      .trim();
-
-    const parsedData = JSON.parse(cleanText);
+    const parsedData = extractJsonObject(aiResponse);
 
     res.json({
       message: "Astrology prediction generated",
