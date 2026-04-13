@@ -23,27 +23,39 @@ const isRetryableModelError = (error) => {
   );
 };
 
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const generateAstroReading = async (prompt, options = {}) => {
   let lastError;
+  const maxAttempts = options.maxAttempts || 2;
 
-  for (const modelName of modelNames) {
-    try {
-      const model = genAI.getGenerativeModel({
-        model: modelName,
-        generationConfig: options.generationConfig,
-      });
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    for (const modelName of modelNames) {
+      try {
+        const model = genAI.getGenerativeModel({
+          model: modelName,
+          generationConfig: options.generationConfig,
+        });
 
-      const result = await model.generateContent(prompt);
+        const result = await model.generateContent(prompt);
 
-      return result.response.text();
-    } catch (error) {
-      lastError = error;
+        return result.response.text();
+      } catch (error) {
+        lastError = error;
 
-      if (!isRetryableModelError(error)) {
-        throw error;
+        if (!isRetryableModelError(error)) {
+          throw error;
+        }
+
+        console.warn(
+          `Gemini model ${modelName} failed on attempt ${attempt}, trying fallback:`,
+          error.message
+        );
       }
+    }
 
-      console.warn(`Gemini model ${modelName} failed, trying fallback:`, error.message);
+    if (attempt < maxAttempts) {
+      await wait(1000 * attempt);
     }
   }
 

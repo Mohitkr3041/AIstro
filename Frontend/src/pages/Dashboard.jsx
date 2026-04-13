@@ -10,6 +10,7 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
   const navigate = useNavigate();
   const [birthData, setBirthData] = useState(null);
   const [report, setReport] = useState(null);
+  const [reportError, setReportError] = useState("");
   const [loadingBirth, setLoadingBirth] = useState(true);
   const [loadingReport, setLoadingReport] = useState(false);
 
@@ -39,6 +40,7 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
   const generateReportData = async () => {
     try {
       setLoadingReport(true);
+      setReportError("");
       const res = await generateAstroReport();
       setReport(res.data.data);
     } catch (error) {
@@ -47,6 +49,7 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
         error.response?.data?.error ||
         "Failed to generate report";
 
+      setReportError(errorMessage);
       alert(errorMessage);
     } finally {
       setLoadingReport(false);
@@ -104,6 +107,16 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
         {loadingReport ? (
           <div className="text-center text-indigo-300 animate-pulse text-lg">
             Generating your astrology report...
+          </div>
+        ) : reportError ? (
+          <div className="bg-red-500/10 border border-red-300/30 rounded-2xl p-6 mb-8 text-center">
+            <p className="text-red-100 mb-4">{reportError}</p>
+            <button
+              onClick={generateReportData}
+              className="px-5 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg font-semibold shadow-lg transition"
+            >
+              Try Again
+            </button>
           </div>
         ) : (
           <Report report={report} />

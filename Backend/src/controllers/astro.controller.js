@@ -144,6 +144,7 @@ Return only valid JSON.
 `;
 
     const aiResponse = await generateAstroReading(prompt, {
+      maxAttempts: 3,
       generationConfig: {
         responseMimeType: "application/json",
       },
