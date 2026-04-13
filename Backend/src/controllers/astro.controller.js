@@ -1,5 +1,6 @@
 const BirthDetails = require("../models/birth.model");
 const { generateAstroReading } = require("../services/gemini.service");
+const { calculateVedicChart } = require("../services/chart.service");
 
 const extractJsonObject = (text) => {
   const cleanedText = text.replace(/```json/g, "").replace(/```/g, "").trim();
@@ -55,17 +56,20 @@ const generatePrediction = async (req, res) => {
     }
 
     const { name, dob, tob, place } = birth;
+    const chart = calculateVedicChart({ dob, tob, place });
 
     const prompt = `
 You are AIstro, a professional Vedic astrologer and modern life guide.
 
-Analyze the user's birth details and generate a complete astrology report.
+Analyze the user's birth details and calculated Vedic chart facts to generate a complete astrology report.
 
 IMPORTANT RULES:
 - Output MUST be valid JSON only
 - No markdown
 - No extra explanation
 - Use practical and positive language
+- Use the CALCULATED_CHART exactly as provided
+- Do not recalculate, change, or guess the sun sign, moon sign, or nakshatra
 
 INPUT:
 {
@@ -75,8 +79,19 @@ INPUT:
   "place_of_birth": "${place}"
 }
 
+CALCULATED_CHART:
+${JSON.stringify(chart, null, 2)}
+
 OUTPUT FORMAT:
 {
+  "chart_summary": {
+    "zodiac_system": "${chart.zodiac_system}",
+    "ayanamsa": "${chart.ayanamsa}",
+    "sun_sign": "${chart.sun_sign}",
+    "moon_sign": "${chart.moon_sign}",
+    "moon_nakshatra": "${chart.moon_nakshatra}",
+    "timezone_assumption": "${chart.timezone_assumption}"
+  },
   "quick_summary": {
     "personality": "",
     "strength": "",

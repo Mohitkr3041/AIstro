@@ -5,6 +5,15 @@ function Report({ report }) {
 
   return (
     <div className="grid md:grid-cols-2 gap-6">
+      <Card title="Vedic Chart Basics" titleColor="text-amber-300">
+        <p className="mb-2"><span className="font-semibold">System:</span> {report.chart_summary?.zodiac_system}</p>
+        <p className="mb-2"><span className="font-semibold">Ayanamsa:</span> {report.chart_summary?.ayanamsa}</p>
+        <p className="mb-2"><span className="font-semibold">Sun Sign:</span> {report.chart_summary?.sun_sign}</p>
+        <p className="mb-2"><span className="font-semibold">Moon Sign:</span> {report.chart_summary?.moon_sign}</p>
+        <p className="mb-2"><span className="font-semibold">Moon Nakshatra:</span> {report.chart_summary?.moon_nakshatra}</p>
+        <p><span className="font-semibold">Time Zone:</span> {report.chart_summary?.timezone_assumption}</p>
+      </Card>
+
       <Card title="Quick Summary" titleColor="text-indigo-300">
         <p className="mb-2"><span className="font-semibold">Personality:</span> {report.quick_summary?.personality}</p>
         <p className="mb-2"><span className="font-semibold">Strength:</span> {report.quick_summary?.strength}</p>
