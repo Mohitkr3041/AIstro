@@ -5,12 +5,12 @@ if (!process.env.GEMINI_API_KEY) {
 }
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const modelNames = (
-  process.env.GEMINI_MODEL || "gemini-2.5-flash,gemini-2.0-flash,gemini-2.0-flash-lite"
-)
+const fallbackModelNames = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.0-flash-lite"];
+const configuredModelNames = (process.env.GEMINI_MODEL || "")
   .split(",")
   .map((modelName) => modelName.trim())
   .filter(Boolean);
+const modelNames = [...new Set([...configuredModelNames, ...fallbackModelNames])];
 
 const isRetryableModelError = (error) => {
   const message = error?.message || "";
@@ -23,13 +23,14 @@ const isRetryableModelError = (error) => {
   );
 };
 
-const generateAstroReading = async (prompt) => {
+const generateAstroReading = async (prompt, options = {}) => {
   let lastError;
 
   for (const modelName of modelNames) {
     try {
       const model = genAI.getGenerativeModel({
         model: modelName,
+        generationConfig: options.generationConfig,
       });
 
       const result = await model.generateContent(prompt);

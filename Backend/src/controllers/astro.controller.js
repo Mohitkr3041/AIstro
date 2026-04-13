@@ -30,6 +30,15 @@ const getPredictionErrorMessage = (error) => {
     return "AI generated an invalid report format. Please try again.";
   }
 
+  if (
+    message.includes("429") ||
+    message.includes("503") ||
+    message.includes("high demand") ||
+    message.includes("Service Unavailable")
+  ) {
+    return "AI service is busy right now. Please try again in a minute.";
+  }
+
   return "Failed to generate astrology prediction";
 };
 
@@ -134,7 +143,11 @@ OUTPUT FORMAT:
 Return only valid JSON.
 `;
 
-    const aiResponse = await generateAstroReading(prompt);
+    const aiResponse = await generateAstroReading(prompt, {
+      generationConfig: {
+        responseMimeType: "application/json",
+      },
+    });
     const parsedData = extractJsonObject(aiResponse);
 
     res.json({
