@@ -146,7 +146,9 @@ Return only valid JSON.
     const aiResponse = await generateAstroReading(prompt, {
       maxAttempts: 3,
       generationConfig: {
+        maxOutputTokens: 4096,
         responseMimeType: "application/json",
+        temperature: 0.7,
       },
     });
     const parsedData = extractJsonObject(aiResponse);

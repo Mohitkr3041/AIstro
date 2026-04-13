@@ -5,7 +5,13 @@ if (!process.env.GEMINI_API_KEY) {
 }
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const fallbackModelNames = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.0-flash-lite"];
+const fallbackModelNames = [
+  "gemini-2.5-flash-lite",
+  "gemini-2.5-flash",
+  "gemini-2.0-flash-lite",
+  "gemini-2.0-flash",
+  "gemini-1.5-flash-8b",
+];
 const configuredModelNames = (process.env.GEMINI_MODEL || "")
   .split(",")
   .map((modelName) => modelName.trim())
