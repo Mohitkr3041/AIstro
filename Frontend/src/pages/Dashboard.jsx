@@ -42,7 +42,12 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
       const res = await generateAstroReport();
       setReport(res.data.data);
     } catch (error) {
-      alert(error.response?.data?.message || "Failed to generate report");
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Failed to generate report";
+
+      alert(errorMessage);
     } finally {
       setLoadingReport(false);
     }

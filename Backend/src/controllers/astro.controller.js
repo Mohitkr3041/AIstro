@@ -19,6 +19,20 @@ const extractJsonObject = (text) => {
   }
 };
 
+const getPredictionErrorMessage = (error) => {
+  const message = error?.message || "";
+
+  if (message.includes("API key") || message.includes("403 Forbidden")) {
+    return "AI service authentication failed. Please update the Gemini API key on the server.";
+  }
+
+  if (message.includes("valid JSON")) {
+    return "AI generated an invalid report format. Please try again.";
+  }
+
+  return "Failed to generate astrology prediction";
+};
+
 const generatePrediction = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -128,9 +142,10 @@ Return only valid JSON.
       data: parsedData,
     });
   } catch (error) {
+    console.error("Astrology prediction failed:", error);
+
     res.status(500).json({
-      message: "Failed to generate astrology prediction",
-      error: error.message,
+      message: getPredictionErrorMessage(error),
     });
   }
 };
