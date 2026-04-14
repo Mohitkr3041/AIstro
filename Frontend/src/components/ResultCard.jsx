@@ -1,8 +1,8 @@
-function ResultCard({ result, loading }) {
+﻿function ResultCard({ result, loading }) {
   if (loading) {
     return (
-      <div className="mt-6 text-center text-indigo-300">
-        🔮 Reading your stars...
+      <div className="mt-6 rounded-lg border border-white/10 bg-white/[0.06] p-5 text-center text-teal-200">
+        Reading your stars...
       </div>
     );
   }
@@ -10,10 +10,10 @@ function ResultCard({ result, loading }) {
   if (!result) return null;
 
   return (
-    <div className="mt-6 p-5 bg-white/10 backdrop-blur-lg rounded-xl text-white">
-      <h2 className="text-lg font-bold mb-3">✨ Astrology Data</h2>
+    <div className="mt-6 rounded-lg border border-white/10 bg-white/[0.06] p-5 text-white">
+      <h2 className="mb-3 text-lg font-bold">Astrology Data</h2>
 
-      <pre className="text-xs whitespace-pre-wrap">
+      <pre className="overflow-x-auto whitespace-pre-wrap text-xs text-white/72">
         {JSON.stringify(result, null, 2)}
       </pre>
     </div>

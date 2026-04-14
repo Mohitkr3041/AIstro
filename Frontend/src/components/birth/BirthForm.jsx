@@ -73,6 +73,8 @@ function BirthForm() {
     }
   };
 
+  const inputClass = "w-full rounded-lg border border-white/15 bg-white/10 p-3 text-white placeholder-white/40 outline-none transition focus:border-teal-300";
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
@@ -88,24 +90,26 @@ function BirthForm() {
         value={formData.name}
         onChange={handleChange}
         autoComplete="name"
-        className="w-full p-3 rounded-lg bg-white/20 border border-white/30 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        className={inputClass}
       />
 
-      <input
-        type="date"
-        name="dob"
-        value={formData.dob}
-        onChange={handleChange}
-        className="w-full p-3 rounded-lg bg-white/20 border border-white/30 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-      />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <input
+          type="date"
+          name="dob"
+          value={formData.dob}
+          onChange={handleChange}
+          className={inputClass}
+        />
 
-      <input
-        type="time"
-        name="tob"
-        value={formData.tob}
-        onChange={handleChange}
-        className="w-full p-3 rounded-lg bg-white/20 border border-white/30 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-      />
+        <input
+          type="time"
+          name="tob"
+          value={formData.tob}
+          onChange={handleChange}
+          className={inputClass}
+        />
+      </div>
 
       <input
         type="text"
@@ -114,13 +118,13 @@ function BirthForm() {
         value={formData.place}
         onChange={handleChange}
         autoComplete="address-level2"
-        className="w-full p-3 rounded-lg bg-white/20 border border-white/30 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        className={inputClass}
       />
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg font-semibold hover:scale-105 transition disabled:opacity-70 disabled:hover:scale-100"
+        className="w-full rounded-lg bg-teal-300 py-3 font-semibold text-black transition hover:bg-teal-200 disabled:opacity-70"
       >
         {loading ? "Saving..." : "Save & Continue"}
       </button>

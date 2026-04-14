@@ -20,7 +20,7 @@ function ChatInput({ onSend, loading }) {
   };
 
   return (
-    <div className="flex gap-3">
+    <div className="grid gap-3 sm:flex">
       <input
         type="text"
         placeholder="Type your question..."
@@ -28,12 +28,12 @@ function ChatInput({ onSend, loading }) {
         maxLength={1000}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="flex-1 rounded-lg bg-white/10 border border-white/20 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-400"
+        className="min-w-0 flex-1 rounded-lg border border-white/20 bg-white/10 px-4 py-3 outline-none focus:ring-2 focus:ring-teal-300"
       />
       <button
         onClick={handleSend}
         disabled={loading || !message.trim()}
-        className="px-5 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg font-semibold disabled:opacity-60"
+        className="rounded-lg bg-teal-300 px-5 py-3 font-semibold text-black disabled:opacity-60 sm:w-auto"
       >
         {loading ? "Sending..." : "Send"}
       </button>
@@ -42,3 +42,4 @@ function ChatInput({ onSend, loading }) {
 }
 
 export default ChatInput;
+
