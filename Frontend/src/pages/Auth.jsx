@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getBirthDetails } from "../services/birth.service";
 import { loginUser, registerUser } from "../services/auth.service";
 
-function Auth() {
+function Auth({ setIsAuthenticated = () => {} }) {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
 
@@ -42,6 +42,8 @@ function Auth() {
         });
         return;
       }
+
+      setIsAuthenticated(true);
 
       const birthRes = await getBirthDetails();
 

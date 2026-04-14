@@ -4,7 +4,7 @@ import Auth from "./pages/Auth";
 import BirthDetails from "./pages/BirthDetails";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/common/ProtectedRoute";
-import { getBirthDetails } from "./services/birth.service";
+import { getCurrentUser } from "./services/auth.service";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -12,7 +12,7 @@ function App() {
   useEffect(() => {
     let isMounted = true;
 
-    getBirthDetails()
+    getCurrentUser()
       .then(() => {
         if (!isMounted) {
           return;

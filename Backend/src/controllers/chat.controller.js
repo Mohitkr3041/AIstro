@@ -4,10 +4,14 @@ const { generateAstroReading } = require("../services/gemini.service");
 const askAstroChat = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { message } = req.body;
+    const message = typeof req.body.message === "string" ? req.body.message.trim() : "";
 
-    if (!message || !message.trim()) {
+    if (!message) {
       return res.status(400).json({ message: "Message is required" });
+    }
+
+    if (message.length > 1000) {
+      return res.status(400).json({ message: "Message must be under 1000 characters" });
     }
 
     const birth = await BirthDetails.findOne({ userId });

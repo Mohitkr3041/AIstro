@@ -1,0 +1,68 @@
+# AIstro 2.0
+
+AIstro is a MERN-style astrology app with a React frontend, Express/MongoDB backend, cookie-based authentication, birth detail storage, and Gemini-powered astrology reports and chat.
+
+## Project Structure
+
+- `Frontend/` - Vite React app
+- `Backend/` - Express API
+
+## Backend Setup
+
+Create `Backend/.env`:
+
+```env
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_long_random_secret
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-2.5-flash-lite
+CLIENT_ORIGIN=http://localhost:5173
+```
+
+Run the backend:
+
+```bash
+cd Backend
+npm install
+npm run dev
+```
+
+## Frontend Setup
+
+Create `Frontend/.env`:
+
+```env
+VITE_API_URL=http://localhost:5000
+```
+
+Run the frontend:
+
+```bash
+cd Frontend
+npm install
+npm run dev
+```
+
+## Production Notes
+
+- Set `CLIENT_ORIGIN` on the backend to the deployed frontend URL.
+- Set `VITE_API_URL` on the frontend to the deployed backend URL.
+- Keep `.env` files private. They should not be committed.
+- The backend uses HTTP-only cookies, so CORS origins and cookie settings must match the deployment domains.
+
+## Useful Scripts
+
+Backend:
+
+```bash
+npm run dev
+```
+
+Frontend:
+
+```bash
+npm run dev
+npm run build
+npm run lint
+```
