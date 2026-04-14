@@ -1,6 +1,8 @@
 const BirthDetails = require("../models/birth.model");
+const AstroReport = require("../models/report.model");
 const { generateAstroReading } = require("../services/gemini.service");
 const { calculateVedicChart } = require("../services/chart.service");
+const crypto = require("crypto");
 
 const extractJsonObject = (text) => {
   const cleanedText = text.replace(/```json/g, "").replace(/```/g, "").trim();
@@ -43,6 +45,11 @@ const getPredictionErrorMessage = (error) => {
   return "Failed to generate astrology prediction";
 };
 
+const getBirthHash = ({ name, dob, tob, place }) => {
+  const payload = JSON.stringify({ name, dob, tob, place });
+  return crypto.createHash("sha256").update(payload).digest("hex");
+};
+
 const generatePrediction = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -56,6 +63,17 @@ const generatePrediction = async (req, res) => {
     }
 
     const { name, dob, tob, place } = birth;
+    const birthHash = getBirthHash({ name, dob, tob, place });
+    const cachedReport = await AstroReport.findOne({ userId, birthHash });
+
+    if (cachedReport) {
+      return res.json({
+        message: "Astrology prediction loaded from cache",
+        cached: true,
+        data: cachedReport.report,
+      });
+    }
+
     const chart = calculateVedicChart({ dob, tob, place });
 
     const prompt = `
@@ -70,6 +88,8 @@ IMPORTANT RULES:
 - Use practical and positive language
 - Use the CALCULATED_CHART exactly as provided
 - Do not recalculate, change, or guess the sun sign, moon sign, or nakshatra
+- Do not give medical, legal, financial, or emergency instructions
+- For serious health, money, legal, or safety concerns, encourage consulting a qualified professional
 
 INPUT:
 {
@@ -168,8 +188,15 @@ Return only valid JSON.
     });
     const parsedData = extractJsonObject(aiResponse);
 
+    await AstroReport.findOneAndUpdate(
+      { userId, birthHash },
+      { report: parsedData },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+
     res.json({
       message: "Astrology prediction generated",
+      cached: false,
       data: parsedData,
     });
   } catch (error) {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getBirthDetails } from "../services/birth.service";
 import { generateAstroReport } from "../services/astro.service";
@@ -11,8 +11,34 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
   const [birthData, setBirthData] = useState(null);
   const [report, setReport] = useState(null);
   const [reportError, setReportError] = useState("");
+  const [dashboardError, setDashboardError] = useState("");
+  const [notice, setNotice] = useState("");
   const [loadingBirth, setLoadingBirth] = useState(true);
   const [loadingReport, setLoadingReport] = useState(false);
+
+  const generateReportData = async () => {
+    try {
+      setLoadingReport(true);
+      setReportError("");
+      setNotice("");
+      const res = await generateAstroReport();
+      setReport(res.data.data);
+      setNotice(
+        res.data.cached
+          ? "Loaded your saved astrology report."
+          : "Generated a fresh astrology report."
+      );
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Failed to generate report";
+
+      setReportError(errorMessage);
+    } finally {
+      setLoadingReport(false);
+    }
+  };
 
   useEffect(() => {
     const fetchBirthDetails = async () => {
@@ -28,7 +54,7 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
         setBirthData(data);
         generateReportData();
       } catch (error) {
-        alert(error.response?.data?.message || "Failed to fetch birth details");
+        setDashboardError(error.response?.data?.message || "Failed to fetch birth details.");
       } finally {
         setLoadingBirth(false);
       }
@@ -37,33 +63,13 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
     fetchBirthDetails();
   }, [navigate]);
 
-  const generateReportData = async () => {
-    try {
-      setLoadingReport(true);
-      setReportError("");
-      const res = await generateAstroReport();
-      setReport(res.data.data);
-    } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        "Failed to generate report";
-
-      setReportError(errorMessage);
-      alert(errorMessage);
-    } finally {
-      setLoadingReport(false);
-    }
-  };
-
   const handleLogout = async () => {
     try {
-      const res = await logoutUser();
-      alert(res.data.message);
+      await logoutUser();
       setIsAuthenticated(false);
       navigate("/", { replace: true });
     } catch (error) {
-      alert(error.response?.data?.message || error.message || "Logout failed");
+      setDashboardError(error.response?.data?.message || error.message || "Logout failed.");
     }
   };
 
@@ -80,7 +86,7 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
           <div>
-            <h1 className="text-4xl font-bold mb-2">🔮 AIstro Dashboard</h1>
+            <h1 className="text-4xl font-bold mb-2">AIstro Dashboard</h1>
             <p className="text-gray-300">Your personalized astrology insights</p>
           </div>
 
@@ -91,6 +97,18 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
             Logout
           </button>
         </div>
+
+        {dashboardError && (
+          <div className="mb-6 rounded-lg border border-red-300/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+            {dashboardError}
+          </div>
+        )}
+
+        {notice && !reportError && (
+          <div className="mb-6 rounded-lg border border-emerald-300/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
+            {notice}
+          </div>
+        )}
 
         {birthData && (
           <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 mb-8">

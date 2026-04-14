@@ -1,32 +1,69 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Message from "./Message";
 import ChatInput from "./ChatInput";
-import { askAstroChat } from "../../services/chat.service";
+import { askAstroChat, getChatHistory } from "../../services/chat.service";
 
 function ChatBox({ birthData }) {
-  const [messages, setMessages] = useState([
-    {
-      text: `Hello ${birthData?.name || "friend"}, ask me anything about your chart.`,
-      sender: "ai",
-    },
-  ]);
+  const welcomeMessage = useMemo(() => ({
+    text: `Hello ${birthData?.name || "friend"}, ask me anything about your chart.`,
+    sender: "ai",
+  }), [birthData?.name]);
+
+  const [messages, setMessages] = useState([welcomeMessage]);
   const [loading, setLoading] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(true);
+  const [historyError, setHistoryError] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadHistory = async () => {
+      try {
+        setLoadingHistory(true);
+        setHistoryError("");
+        const res = await getChatHistory();
+        const savedMessages = res.data.data || [];
+
+        if (!isMounted) {
+          return;
+        }
+
+        setMessages(savedMessages.length ? savedMessages : [welcomeMessage]);
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        setMessages([welcomeMessage]);
+        setHistoryError(error.response?.data?.message || "Could not load chat history.");
+      } finally {
+        if (isMounted) {
+          setLoadingHistory(false);
+        }
+      }
+    };
+
+    loadHistory();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [welcomeMessage]);
 
   const handleSend = async (userMessage) => {
-    const updatedMessages = [
-      ...messages,
-      { text: userMessage, sender: "user" },
-    ];
+    const updatedMessages = [...messages, { text: userMessage, sender: "user" }];
     setMessages(updatedMessages);
 
     try {
       setLoading(true);
       const res = await askAstroChat(userMessage);
+      const savedMessages = res.data.data;
 
-      setMessages([
-        ...updatedMessages,
-        { text: res.data.reply, sender: "ai" },
-      ]);
+      setMessages(
+        Array.isArray(savedMessages) && savedMessages.length
+          ? [...messages, ...savedMessages]
+          : [...updatedMessages, { text: res.data.reply, sender: "ai" }]
+      );
     } catch (error) {
       setMessages([
         ...updatedMessages,
@@ -51,12 +88,22 @@ function ChatBox({ birthData }) {
 
       <div className="rounded-xl border border-white/20 bg-black/20 p-4">
         <div className="mb-4 space-y-3 max-h-96 overflow-y-auto pr-2">
+          {loadingHistory && (
+            <p className="text-sm text-gray-300">Loading chat history...</p>
+          )}
+
+          {historyError && (
+            <div className="rounded-lg border border-red-300/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+              {historyError}
+            </div>
+          )}
+
           {messages.map((msg, index) => (
-            <Message key={index} text={msg.text} sender={msg.sender} />
+            <Message key={msg.id || index} text={msg.text} sender={msg.sender} />
           ))}
         </div>
 
-        <ChatInput onSend={handleSend} loading={loading} />
+        <ChatInput onSend={handleSend} loading={loading || loadingHistory} />
       </div>
     </div>
   );

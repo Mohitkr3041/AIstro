@@ -2,8 +2,16 @@ const express = require("express");
 const router = express.Router();
 
 const protect = require("../middleware/auth.middleware");
-const { askAstroChat } = require("../controllers/chat.controller");
+const createRateLimiter = require("../middleware/rateLimit.middleware");
+const { askAstroChat, getChatHistory } = require("../controllers/chat.controller");
 
-router.post("/ask", protect, askAstroChat);
+const chatRateLimiter = createRateLimiter({
+  windowMs: 60 * 1000,
+  maxRequests: 8,
+  message: "Too many AI requests. Please wait a minute and try again.",
+});
+
+router.get("/history", protect, getChatHistory);
+router.post("/ask", protect, chatRateLimiter, askAstroChat);
 
 module.exports = router;
