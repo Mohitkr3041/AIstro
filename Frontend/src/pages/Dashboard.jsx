@@ -90,28 +90,28 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#071014] text-white">
+    <div className="min-h-screen bg-[#060d10] text-white">
       <div className="relative overflow-hidden border-b border-white/10">
         <img
           src={heroImage}
           alt="Abstract astrology artwork"
-          className="absolute inset-0 h-full w-full object-cover opacity-25"
+          className="absolute inset-0 h-full w-full object-cover opacity-20"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#071014] via-[#071014]/85 to-[#1e1022]/70" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#060d10] via-[#071316]/90 to-[#102329]/80" />
         <div className="relative mx-auto max-w-6xl px-3 py-6 sm:px-4 sm:py-8">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
-              <p className="text-sm font-semibold uppercase tracking-wide text-teal-200">Personal astrology workspace</p>
-              <h1 className="mt-3 text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">AIstro Dashboard</h1>
+              <p className="text-sm font-semibold uppercase tracking-wide text-cyan-200">Personal astrology workspace</p>
+              <h1 className="mt-3 text-3xl font-black leading-tight sm:text-4xl md:text-5xl">AIstro Dashboard</h1>
               <p className="mt-3 max-w-2xl text-base leading-7 text-white/72">
-                Explore your birth details, read your report, and keep a running conversation with Astro AI.
+                Explore future timing, life guidance, remedies, and your personal reading in one clear workspace.
               </p>
             </div>
 
             <div className="grid gap-3 sm:flex sm:flex-wrap">
               <button
                 onClick={() => navigate("/birth")}
-                className="rounded-lg border border-white/15 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/15"
+                className="rounded-lg border border-white/15 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-cyan-200/60 hover:bg-cyan-300/10"
               >
                 Edit Birth Details
               </button>
@@ -156,13 +156,13 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
           <section className="rounded-lg border border-white/10 bg-white/[0.06] p-5">
             <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-wide text-amber-200">Birth Details</p>
+                <p className="text-sm font-semibold uppercase tracking-wide text-cyan-200">Birth Details</p>
                 <h2 className="mt-1 text-2xl font-bold">Your saved chart input</h2>
               </div>
               <button
                 onClick={() => generateReportData(true)}
                 disabled={loadingReport}
-                className="w-full rounded-lg bg-teal-300 px-4 py-2 text-sm font-semibold text-black transition hover:bg-teal-200 disabled:opacity-60 sm:w-auto"
+                className="w-full rounded-lg bg-amber-300 px-4 py-2 text-sm font-black text-slate-950 shadow-lg shadow-amber-950/30 transition hover:bg-amber-200 disabled:opacity-60 sm:w-auto"
               >
                 {loadingReport ? "Generating..." : "Refresh Report"}
               </button>
@@ -193,7 +193,7 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
             <p className="mb-4 text-red-100">{reportError}</p>
             <button
               onClick={generateReportData}
-              className="rounded-lg bg-teal-300 px-5 py-3 font-semibold text-black transition hover:bg-teal-200"
+              className="rounded-lg bg-amber-300 px-5 py-3 font-black text-slate-950 transition hover:bg-amber-200"
             >
               Try Again
             </button>
