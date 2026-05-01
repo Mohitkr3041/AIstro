@@ -64,9 +64,10 @@ const generatePrediction = async (req, res) => {
 
     const { name, dob, tob, place } = birth;
     const birthHash = getBirthHash({ name, dob, tob, place });
+    const forceRefresh = Boolean(req.body?.forceRefresh);
     const cachedReport = await AstroReport.findOne({ userId, birthHash });
 
-    if (cachedReport) {
+    if (cachedReport && !forceRefresh) {
       return res.json({
         message: "Astrology prediction loaded from cache",
         cached: true,
@@ -79,13 +80,17 @@ const generatePrediction = async (req, res) => {
     const prompt = `
 You are AIstro, a professional Vedic astrologer and modern life guide.
 
-Analyze the user's birth details and calculated Vedic chart facts to generate a complete astrology report.
+Analyze the user's birth details and calculated Vedic chart facts to generate an engaging astrology reading journey.
 
 IMPORTANT RULES:
 - Output MUST be valid JSON only
 - No markdown
 - No extra explanation
 - Use practical and positive language
+- Write in a personally revealing, curiosity-building style
+- First create trust with hidden self-insights and likely past patterns, then give future predictions
+- Keep every point specific, concise, and easy to read on a mobile screen
+- Use phrases like "your chart suggests", "you may have", and "this can show up as" instead of absolute claims
 - Use the CALCULATED_CHART exactly as provided
 - Do not recalculate, change, or guess the sun sign, moon sign, or nakshatra
 - Do not give medical, legal, financial, or emergency instructions
@@ -118,6 +123,48 @@ OUTPUT FORMAT:
     "relationship_style": "",
     "career_direction": "",
     "next_30_days_highlight": ""
+  },
+  "engagement_journey": {
+    "opening_hook": "",
+    "trust_statement": "",
+    "curiosity_lines": ["", "", ""],
+    "reveal_sections": [
+      {
+        "title": "The part of you people rarely understand",
+        "category": "Hidden self",
+        "hook": "",
+        "insights": ["", "", ""],
+        "action": ""
+      },
+      {
+        "title": "Past patterns your chart remembers",
+        "category": "Past validation",
+        "hook": "",
+        "insights": ["", "", "", ""],
+        "action": ""
+      },
+      {
+        "title": "Where your life is asking for clarity now",
+        "category": "Current phase",
+        "hook": "",
+        "insights": ["", "", ""],
+        "action": ""
+      },
+      {
+        "title": "What is opening next",
+        "category": "Future timeline",
+        "hook": "",
+        "insights": ["", "", "", ""],
+        "action": ""
+      },
+      {
+        "title": "Your personal guidance",
+        "category": "Action plan",
+        "hook": "",
+        "insights": ["", "", ""],
+        "action": ""
+      }
+    ]
   },
   "personality_and_mindset": {
     "nature": "",

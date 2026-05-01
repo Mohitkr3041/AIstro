@@ -17,12 +17,12 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
   const [loadingBirth, setLoadingBirth] = useState(true);
   const [loadingReport, setLoadingReport] = useState(false);
 
-  const generateReportData = async () => {
+  const generateReportData = async (forceRefresh = false) => {
     try {
       setLoadingReport(true);
       setReportError("");
       setNotice("");
-      const res = await generateAstroReport();
+      const res = await generateAstroReport({ forceRefresh });
       setReport(res.data.data);
       setNotice(
         res.data.cached
@@ -160,7 +160,7 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
                 <h2 className="mt-1 text-2xl font-bold">Your saved chart input</h2>
               </div>
               <button
-                onClick={generateReportData}
+                onClick={() => generateReportData(true)}
                 disabled={loadingReport}
                 className="w-full rounded-lg bg-teal-300 px-4 py-2 text-sm font-semibold text-black transition hover:bg-teal-200 disabled:opacity-60 sm:w-auto"
               >

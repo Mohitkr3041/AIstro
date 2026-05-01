@@ -1,3 +1,3 @@
 import api from "../utils/api";
 
-export const generateAstroReport = () => api.post("/astro/generate", {});
+export const generateAstroReport = (options = {}) => api.post("/astro/generate", options);
