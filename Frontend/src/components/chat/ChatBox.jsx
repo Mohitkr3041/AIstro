@@ -1,19 +1,19 @@
-﻿import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Message from "./Message";
 import ChatInput from "./ChatInput";
 import { askAstroChat, getChatHistory } from "../../services/chat.service";
 
 const suggestions = [
-  "What should I focus on this week?",
-  "How can I improve my career direction?",
-  "What relationship pattern should I notice?",
-  "Give me one practical remedy for today.",
+  "Explain my next 30 days from this chart",
+  "Which past pattern should I pay attention to?",
+  "Give me a career action plan from my report",
+  "Turn my remedies into a daily routine",
 ];
 
 function ChatBox({ birthData }) {
   const messagesEndRef = useRef(null);
   const welcomeMessage = useMemo(() => ({
-    text: `Hello ${birthData?.name || "friend"}, ask me anything about your chart.`,
+    text: `Hello ${birthData?.name || "friend"}, ask me to explain any part of your reading.`,
     sender: "ai",
   }), [birthData?.name]);
 
@@ -92,57 +92,61 @@ function ChatBox({ birthData }) {
   };
 
   return (
-    <section className="min-w-0 rounded-lg border border-white/10 bg-white/[0.06] p-4 sm:p-5">
-      <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-teal-200">Astro AI</p>
-          <h2 className="mt-1 text-2xl font-bold">Chat with your chart</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-white/65">
-            Ask about career, relationships, money, mindset, timing, or what to focus on next.
-          </p>
-        </div>
-        <div className="w-fit rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white/65">
-          {messages.filter((msg) => msg.sender === "user").length} saved questions
+    <section className="min-w-0 overflow-hidden rounded-lg border border-white/10 bg-[#171014] shadow-2xl shadow-black/25">
+      <div className="border-b border-white/10 bg-black/20 p-5 sm:p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-[#5eead4]">AIstro companion</p>
+            <h2 className="mt-2 text-2xl font-black text-white">Ask deeper about this reading</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/65">
+              This is the support layer: users can ask why, timing, remedies, or how to act on a prediction.
+            </p>
+          </div>
+          <div className="w-fit rounded-lg border border-white/10 bg-white/[0.055] px-3 py-2 text-sm font-bold text-white/65">
+            {messages.filter((msg) => msg.sender === "user").length} saved questions
+          </div>
         </div>
       </div>
 
-      <div className="mb-4 flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch]">
-        {suggestions.map((suggestion) => (
-          <button
-            key={suggestion}
-            type="button"
-            onClick={() => handleSend(suggestion)}
-            disabled={loading || loadingHistory}
-            className="shrink-0 rounded-lg border border-white/15 bg-black/20 px-3 py-2 text-sm text-white/75 transition hover:border-teal-300/60 hover:text-white disabled:opacity-50"
-          >
-            {suggestion}
-          </button>
-        ))}
-      </div>
-
-      <div className="min-w-0 rounded-lg border border-white/12 bg-black/25 p-3 sm:p-4">
-        <div className="mb-4 max-h-[24rem] space-y-3 overflow-y-auto pr-1 sm:max-h-[28rem] sm:pr-2">
-          {loadingHistory && (
-            <p className="text-sm text-gray-300">Loading chat history...</p>
-          )}
-
-          {historyError && (
-            <div className="rounded-lg border border-red-300/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
-              {historyError}
-            </div>
-          )}
-
-          {messages.map((msg, index) => (
-            <Message key={msg.id || index} text={msg.text} sender={msg.sender} />
+      <div className="p-4 sm:p-5">
+        <div className="mb-4 flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch]">
+          {suggestions.map((suggestion) => (
+            <button
+              key={suggestion}
+              type="button"
+              onClick={() => handleSend(suggestion)}
+              disabled={loading || loadingHistory}
+              className="shrink-0 rounded-lg border border-white/12 bg-white/[0.055] px-3 py-2 text-sm font-bold text-white/75 transition hover:border-[#5eead4]/70 hover:bg-[#5eead4]/10 hover:text-white disabled:opacity-50"
+            >
+              {suggestion}
+            </button>
           ))}
-
-          {loading && (
-            <Message text="Reading the pattern and shaping a reply..." sender="ai" />
-          )}
-          <div ref={messagesEndRef} />
         </div>
 
-        <ChatInput onSend={handleSend} loading={loading || loadingHistory} />
+        <div className="min-w-0 rounded-lg border border-white/10 bg-black/25 p-3 sm:p-4">
+          <div className="mb-4 max-h-[24rem] space-y-3 overflow-y-auto pr-1 sm:max-h-[28rem] sm:pr-2">
+            {loadingHistory && (
+              <p className="text-sm text-white/60">Loading chat history...</p>
+            )}
+
+            {historyError && (
+              <div className="rounded-lg border border-[#ff7a7a]/40 bg-[#ff7a7a]/10 px-4 py-3 text-sm text-red-100">
+                {historyError}
+              </div>
+            )}
+
+            {messages.map((msg, index) => (
+              <Message key={msg.id || index} text={msg.text} sender={msg.sender} />
+            ))}
+
+            {loading && (
+              <Message text="Reading the chart context and shaping a reply..." sender="ai" />
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          <ChatInput onSend={handleSend} loading={loading || loadingHistory} />
+        </div>
       </div>
     </section>
   );

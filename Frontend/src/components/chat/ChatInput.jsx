@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 
 function ChatInput({ onSend, loading }) {
   const [message, setMessage] = useState("");
@@ -20,26 +20,25 @@ function ChatInput({ onSend, loading }) {
   };
 
   return (
-    <div className="grid gap-3 sm:flex">
+    <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
       <input
         type="text"
-        placeholder="Type your question..."
+        placeholder="Ask about this reading, timing, or remedies..."
         value={message}
         maxLength={1000}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="min-w-0 flex-1 rounded-lg border border-white/20 bg-white/10 px-4 py-3 outline-none focus:ring-2 focus:ring-teal-300"
+        className="min-w-0 rounded-lg border border-white/15 bg-black/25 px-4 py-3 text-white outline-none transition placeholder:text-white/35 focus:border-[#5eead4] focus:ring-2 focus:ring-[#5eead4]/30"
       />
       <button
         onClick={handleSend}
         disabled={loading || !message.trim()}
-        className="rounded-lg bg-teal-300 px-5 py-3 font-semibold text-black disabled:opacity-60 sm:w-auto"
+        className="rounded-lg border border-[#f8d66d] bg-[#f8d66d] px-5 py-3 font-black text-[#171014] shadow-lg shadow-[#f8d66d]/10 transition hover:bg-[#ffe58a] disabled:opacity-60"
       >
-        {loading ? "Sending..." : "Send"}
+        {loading ? "Reading..." : "Ask"}
       </button>
     </div>
   );
 }
 
 export default ChatInput;
-
