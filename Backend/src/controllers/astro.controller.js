@@ -90,6 +90,9 @@ IMPORTANT RULES:
 - Write in a personally revealing, curiosity-building style
 - First create trust with hidden self-insights and likely past patterns, then give future predictions
 - Keep every point specific, concise, and easy to read on a mobile screen
+- Prefer vivid insight over generic praise; avoid broad lines that could apply to everyone
+- Include accuracy-check moments that make the user think "this has happened to me before"
+- Make future prediction feel like a reward after recognition, past validation, and current clarity
 - Use phrases like "your chart suggests", "you may have", and "this can show up as" instead of absolute claims
 - Use the CALCULATED_CHART exactly as provided
 - Do not recalculate, change, or guess the sun sign, moon sign, or nakshatra
@@ -127,7 +130,25 @@ OUTPUT FORMAT:
   "engagement_journey": {
     "opening_hook": "",
     "trust_statement": "",
+    "spotlight_insight": "",
     "curiosity_lines": ["", "", ""],
+    "accuracy_checks": [
+      {
+        "label": "Past pattern",
+        "statement": "",
+        "why_it_matters": ""
+      },
+      {
+        "label": "Inner pattern",
+        "statement": "",
+        "why_it_matters": ""
+      },
+      {
+        "label": "Current phase",
+        "statement": "",
+        "why_it_matters": ""
+      }
+    ],
     "reveal_sections": [
       {
         "title": "The part of you people rarely understand",
