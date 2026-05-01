@@ -76,9 +76,9 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
 
   if (loadingBirth) {
     return (
-      <div className="min-h-screen bg-[#071014] px-4 py-8 text-white">
+      <div className="min-h-screen bg-[#100b12] px-4 py-8 text-white">
         <div className="mx-auto max-w-6xl space-y-4">
-          <div className="h-40 animate-pulse rounded-lg bg-white/10" />
+          <div className="h-40 animate-pulse rounded-lg bg-[#f8d66d]/10" />
           <div className="grid gap-4 md:grid-cols-3">
             <div className="h-28 animate-pulse rounded-lg bg-white/10" />
             <div className="h-28 animate-pulse rounded-lg bg-white/10" />
@@ -90,28 +90,28 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#060d10] text-white">
+    <div className="min-h-screen bg-[#100b12] text-white">
       <div className="relative overflow-hidden border-b border-white/10">
         <img
           src={heroImage}
           alt="Abstract astrology artwork"
-          className="absolute inset-0 h-full w-full object-cover opacity-20"
+          className="absolute inset-0 h-full w-full object-cover opacity-16"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#060d10] via-[#071316]/90 to-[#102329]/80" />
-        <div className="relative mx-auto max-w-6xl px-3 py-6 sm:px-4 sm:py-8">
+        <div className="absolute inset-0 bg-gradient-to-r from-[#100b12] via-[#171014]/92 to-[#14251f]/82" />
+        <div className="relative mx-auto max-w-6xl px-3 py-7 sm:px-4 sm:py-10">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
-              <p className="text-sm font-semibold uppercase tracking-wide text-cyan-200">Personal astrology workspace</p>
-              <h1 className="mt-3 text-3xl font-black leading-tight sm:text-4xl md:text-5xl">AIstro Dashboard</h1>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-[#5eead4]">AIstro chart intelligence</p>
+              <h1 className="mt-3 text-3xl font-black leading-tight sm:text-4xl md:text-5xl">Your Personal Astrology Reading</h1>
               <p className="mt-3 max-w-2xl text-base leading-7 text-white/72">
-                Explore future timing, life guidance, remedies, and your personal reading in one clear workspace.
+                A guided flow from chart identity to past validation, future timing, life departments, and remedies.
               </p>
             </div>
 
             <div className="grid gap-3 sm:flex sm:flex-wrap">
               <button
                 onClick={() => navigate("/birth")}
-                className="rounded-lg border border-white/15 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-cyan-200/60 hover:bg-cyan-300/10"
+                className="rounded-lg border border-white/15 bg-white/10 px-4 py-3 text-sm font-bold text-white transition hover:border-[#5eead4]/70 hover:bg-[#5eead4]/10"
               >
                 Edit Birth Details
               </button>
@@ -127,12 +127,12 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
           <div className="mt-8 grid gap-3 md:grid-cols-3">
             {[
               ["Profile", birthData?.name || "Saved"],
-              ["Report", report ? "Ready" : loadingReport ? "Generating" : "Pending"],
-              ["Chat", "History enabled"],
+              ["Reading", report ? "Ready" : loadingReport ? "Generating" : "Pending"],
+              ["Flow", "Chart > Past > Future"],
             ].map(([label, value]) => (
-              <div key={label} className="rounded-lg border border-white/10 bg-black/25 px-4 py-3 backdrop-blur">
-                <p className="text-xs uppercase tracking-wide text-white/45">{label}</p>
-                <p className="mt-1 text-lg font-semibold text-white">{value}</p>
+              <div key={label} className="rounded-lg border border-white/10 bg-black/30 px-4 py-3 backdrop-blur">
+                <p className="text-xs font-black uppercase tracking-wide text-white/45">{label}</p>
+                <p className="mt-1 text-lg font-black text-white">{value}</p>
               </div>
             ))}
           </div>
@@ -153,18 +153,18 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
         )}
 
         {birthData && (
-          <section className="rounded-lg border border-white/10 bg-white/[0.06] p-5">
+          <section className="rounded-lg border border-white/10 bg-[#171014] p-5 shadow-xl shadow-black/20">
             <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-wide text-cyan-200">Birth Details</p>
-                <h2 className="mt-1 text-2xl font-bold">Your saved chart input</h2>
+                <p className="text-sm font-black uppercase tracking-wide text-[#5eead4]">Birth Details</p>
+                <h2 className="mt-1 text-2xl font-black">Your chart input</h2>
               </div>
               <button
                 onClick={() => generateReportData(true)}
                 disabled={loadingReport}
-                className="w-full rounded-lg bg-amber-300 px-4 py-2 text-sm font-black text-slate-950 shadow-lg shadow-amber-950/30 transition hover:bg-amber-200 disabled:opacity-60 sm:w-auto"
+                className="w-full rounded-lg border border-[#f8d66d] bg-[#f8d66d] px-4 py-2 text-sm font-black text-[#171014] shadow-lg shadow-[#f8d66d]/20 transition hover:bg-[#ffe58a] disabled:opacity-60 sm:w-auto"
               >
-                {loadingReport ? "Generating..." : "Refresh Report"}
+                {loadingReport ? "Generating..." : "Generate Fresh Reading"}
               </button>
             </div>
             <div className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
@@ -175,8 +175,8 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
                 ["Place", birthData.place],
               ].map(([label, value]) => (
                 <div key={label} className="rounded-lg border border-white/10 bg-black/20 px-3 py-3">
-                  <p className="text-xs uppercase tracking-wide text-white/45">{label}</p>
-                  <p className="mt-1 font-semibold text-white">{value}</p>
+                  <p className="text-xs font-black uppercase tracking-wide text-white/45">{label}</p>
+                  <p className="mt-1 font-bold text-white">{value}</p>
                 </div>
               ))}
             </div>
@@ -185,15 +185,15 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
 
         {loadingReport ? (
           <section className="grid gap-4 lg:grid-cols-2">
-            <div className="h-56 animate-pulse rounded-lg bg-white/10" />
-            <div className="h-56 animate-pulse rounded-lg bg-white/10" />
+            <div className="h-56 animate-pulse rounded-lg bg-[#f8d66d]/10" />
+            <div className="h-56 animate-pulse rounded-lg bg-[#5eead4]/10" />
           </section>
         ) : reportError ? (
           <section className="rounded-lg border border-red-300/30 bg-red-500/10 p-6 text-center">
             <p className="mb-4 text-red-100">{reportError}</p>
             <button
               onClick={generateReportData}
-              className="rounded-lg bg-amber-300 px-5 py-3 font-black text-slate-950 transition hover:bg-amber-200"
+              className="rounded-lg border border-[#f8d66d] bg-[#f8d66d] px-5 py-3 font-black text-[#171014] transition hover:bg-[#ffe58a]"
             >
               Try Again
             </button>

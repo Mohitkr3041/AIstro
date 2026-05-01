@@ -2,19 +2,30 @@ import { useMemo, useState } from "react";
 
 const clean = (items = []) => items.filter(Boolean);
 
-const field = (label, value) => (
-  <p className="text-sm leading-6 text-slate-300">
-    <span className="font-semibold text-white">{label}:</span> {value || "Not available"}
-  </p>
-);
+const steps = [
+  { id: "identity", label: "Your Chart", hint: "Who you are" },
+  { id: "past", label: "Past Proof", hint: "What happened" },
+  { id: "future", label: "Future", hint: "What comes next" },
+  { id: "departments", label: "Life Areas", hint: "By category" },
+  { id: "remedies", label: "Remedies", hint: "What to do" },
+];
 
-const ActionButton = ({ children, active, onClick, tone = "primary", disabled = false }) => {
+const accentClasses = {
+  coral: "border-[#ff7a7a]/35 bg-[#ff7a7a]/10",
+  mint: "border-[#5eead4]/35 bg-[#5eead4]/10",
+  gold: "border-[#f8d66d]/35 bg-[#f8d66d]/10",
+  blue: "border-[#7dd3fc]/35 bg-[#7dd3fc]/10",
+  green: "border-[#86efac]/35 bg-[#86efac]/10",
+  violet: "border-[#c4b5fd]/35 bg-[#c4b5fd]/10",
+};
+
+const getAccent = (index) => ["coral", "mint", "gold", "blue", "green", "violet"][index % 6];
+
+function PrimaryButton({ children, onClick, variant = "primary", disabled = false }) {
   const styles = {
-    primary: active
-      ? "border-cyan-300 bg-cyan-300 text-slate-950 shadow-lg shadow-cyan-950/30"
-      : "border-white/10 bg-white/[0.07] text-slate-200 hover:border-cyan-200/70 hover:bg-cyan-300/10 hover:text-white",
-    gold: "border-amber-200 bg-amber-300 text-slate-950 shadow-lg shadow-amber-950/30 hover:bg-amber-200",
-    quiet: "border-white/10 bg-white/[0.06] text-slate-300 hover:border-white/25 hover:text-white",
+    primary: "border-[#f8d66d] bg-[#f8d66d] text-[#171014] shadow-lg shadow-[#f8d66d]/20 hover:bg-[#ffe58a]",
+    secondary: "border-white/15 bg-white/[0.06] text-white hover:border-[#5eead4]/60 hover:bg-[#5eead4]/10",
+    danger: "border-[#ff7a7a]/40 bg-[#ff7a7a]/15 text-white hover:bg-[#ff7a7a]/20",
   };
 
   return (
@@ -22,49 +33,52 @@ const ActionButton = ({ children, active, onClick, tone = "primary", disabled = 
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`rounded-lg border px-4 py-2.5 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-45 ${styles[tone]}`}
+      className={`rounded-lg border px-4 py-3 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50 ${styles[variant]}`}
     >
       {children}
     </button>
   );
-};
+}
 
-function SectionShell({ eyebrow, title, subtitle, children, action }) {
+function Metric({ label, value }) {
   return (
-    <section className="overflow-hidden rounded-lg border border-white/10 bg-[#0c1417] shadow-2xl shadow-black/20">
-      <div className="border-b border-white/10 bg-white/[0.035] p-5 sm:p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-cyan-200">{eyebrow}</p>
-            <h2 className="mt-2 text-2xl font-bold leading-tight text-white sm:text-3xl">{title}</h2>
-            {subtitle && <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">{subtitle}</p>}
-          </div>
-          {action}
-        </div>
+    <div className="rounded-lg border border-white/10 bg-white/[0.055] p-3">
+      <p className="text-xs font-bold uppercase tracking-wide text-white/45">{label}</p>
+      <p className="mt-1 text-sm font-black text-white">{value || "-"}</p>
+    </div>
+  );
+}
+
+function SectionHeader({ eyebrow, title, subtitle, action }) {
+  return (
+    <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <p className="text-xs font-black uppercase tracking-[0.18em] text-[#5eead4]">{eyebrow}</p>
+        <h2 className="mt-2 text-2xl font-black leading-tight text-white sm:text-3xl">{title}</h2>
+        {subtitle && <p className="mt-2 max-w-3xl text-sm leading-6 text-[#d8dde2]/78">{subtitle}</p>}
       </div>
-      <div className="p-5 sm:p-6">{children}</div>
+      {action}
+    </div>
+  );
+}
+
+function Panel({ children, className = "" }) {
+  return (
+    <section className={`rounded-lg border border-white/10 bg-[#171014] p-5 shadow-2xl shadow-black/25 sm:p-6 ${className}`}>
+      {children}
     </section>
   );
 }
 
-function InsightCard({ eyebrow, title, body, action, tone = "cyan" }) {
-  const tones = {
-    cyan: "border-cyan-200/25 bg-cyan-300/[0.08]",
-    amber: "border-amber-200/25 bg-amber-300/[0.08]",
-    rose: "border-rose-200/25 bg-rose-300/[0.08]",
-    emerald: "border-emerald-200/25 bg-emerald-300/[0.08]",
-    violet: "border-violet-200/25 bg-violet-300/[0.08]",
-    sky: "border-sky-200/25 bg-sky-300/[0.08]",
-  };
-
+function InfoCard({ eyebrow, title, children, accent = "mint", action }) {
   return (
-    <article className={`h-full rounded-lg border p-4 ${tones[tone] || tones.cyan}`}>
-      {eyebrow && <p className="text-xs font-bold uppercase tracking-wide text-white/55">{eyebrow}</p>}
-      <h3 className="mt-2 text-lg font-bold leading-tight text-white">{title}</h3>
-      {body && <div className="mt-3 space-y-2 text-sm leading-6 text-slate-300">{body}</div>}
+    <article className={`h-full rounded-lg border p-4 ${accentClasses[accent] || accentClasses.mint}`}>
+      {eyebrow && <p className="text-xs font-black uppercase tracking-wide text-white/50">{eyebrow}</p>}
+      <h3 className="mt-2 text-lg font-black leading-tight text-white">{title || "Not available"}</h3>
+      {children && <div className="mt-3 space-y-2 text-sm leading-6 text-[#d8dde2]/82">{children}</div>}
       {action && (
         <div className="mt-4 rounded-lg border border-white/10 bg-black/20 p-3 text-sm leading-6 text-white">
-          <span className="font-bold text-amber-200">Action: </span>
+          <span className="font-black text-[#f8d66d]">Action: </span>
           {action}
         </div>
       )}
@@ -72,489 +86,491 @@ function InsightCard({ eyebrow, title, body, action, tone = "cyan" }) {
   );
 }
 
-const buildFallbackJourney = (report) => [
-  {
-    title: "The part of you people rarely understand",
-    category: "Hidden self",
-    hook: report.personality_and_mindset?.emotional_pattern || report.quick_summary?.personality,
-    insights: clean([
-      report.personality_and_mindset?.nature,
-      report.personality_and_mindset?.communication_style,
-      report.personality_and_mindset?.stress_handling,
-    ]),
-    action: report.quick_summary?.strength,
-  },
-  {
-    title: "Past patterns your chart remembers",
-    category: "Past validation",
-    hook: "These patterns may explain why some life areas felt delayed, intense, or confusing earlier.",
-    insights: clean([
-      report.career_and_education?.growth_periods,
-      report.love_and_relationships?.relationship_pattern,
-      report.money_and_wealth?.spending_pattern,
-      report.strengths_and_weaknesses?.weaknesses?.[0],
-    ]),
-    action: "Notice the repeating pattern before making the next big decision.",
-  },
-  {
-    title: "Where your life is asking for clarity now",
-    category: "Current phase",
-    hook: report.current_transits?.focus_now || report.quick_summary?.next_30_days_highlight,
-    insights: clean([
-      report.current_transits?.planetary_influence,
-      report.current_transits?.focus_now,
-      report.current_transits?.avoid_now,
-    ]),
-    action: report.remedies?.mindset_remedy,
-  },
-  {
-    title: "What is opening next",
-    category: "Future timeline",
-    hook: report.forecast?.next_30_days || report.quick_summary?.next_30_days_highlight,
-    insights: clean([
-      report.forecast?.next_7_days,
-      report.forecast?.next_30_days,
-      report.forecast?.next_6_months,
-      report.money_and_wealth?.wealth_growth_timeline,
-    ]),
-    action: report.final_guidance?.[0],
-  },
-];
+function BulletList({ items }) {
+  return (
+    <div className="grid gap-2">
+      {clean(items).map((item, index) => (
+        <p key={index} className="rounded-lg border border-white/10 bg-black/20 p-3 text-sm leading-6 text-[#d8dde2]">
+          <span className="mr-2 inline-grid h-6 w-6 place-items-center rounded-md bg-white/10 text-xs font-black text-white">
+            {index + 1}
+          </span>
+          {item}
+        </p>
+      ))}
+    </div>
+  );
+}
 
-const buildFallbackChecks = (report) => [
-  {
-    label: "Past pattern",
-    statement: report.career_and_education?.growth_periods || "Your chart suggests earlier confusion around direction may have shaped your confidence.",
-    why_it_matters: "Use this as an accuracy check before trusting future timing.",
-  },
-  {
-    label: "Inner pattern",
-    statement: report.personality_and_mindset?.emotional_pattern || "You may process more privately than people around you realize.",
-    why_it_matters: "This shows the reading is looking below surface personality.",
-  },
-  {
-    label: "Current phase",
-    statement: report.current_transits?.focus_now || report.quick_summary?.next_30_days_highlight,
-    why_it_matters: "This connects the report to what is happening now.",
-  },
-];
-
-function ReadingSession({ report, onOpenFuture }) {
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [resonance, setResonance] = useState("");
-
-  const journey = report.engagement_journey || {};
+const buildFlow = (report) => {
+  const flow = report.reading_flow || {};
+  const summary = report.chart_summary || {};
   const quick = report.quick_summary || {};
-  const sections = journey.reveal_sections?.length ? journey.reveal_sections : buildFallbackJourney(report);
-  const checks = journey.accuracy_checks?.length ? journey.accuracy_checks : buildFallbackChecks(report);
-  const activeSection = sections[selectedIndex] || sections[0] || {};
-  const progress = sections.length ? ((selectedIndex + 1) / sections.length) * 100 : 0;
-
-  return (
-    <SectionShell
-      eyebrow="Guided reading"
-      title="Start with proof, then reveal the future"
-      subtitle="This keeps the reading easy to follow: first recognition, then past validation, then current clarity, then prediction."
-      action={<ActionButton tone="gold" onClick={onOpenFuture}>Jump to Future</ActionButton>}
-    >
-      <div className="grid gap-5 xl:grid-cols-[1fr_380px]">
-        <div className="space-y-5">
-          <div className="rounded-lg border border-amber-200/30 bg-amber-300/[0.08] p-5">
-            <p className="text-xs font-bold uppercase tracking-wide text-amber-100">Spotlight insight</p>
-            <p className="mt-3 text-2xl font-bold leading-9 text-white">
-              {journey.spotlight_insight || journey.trust_statement || quick.strength || "Your chart suggests your real growth begins when pressure turns into direction."}
-            </p>
-            <p className="mt-3 text-sm leading-6 text-slate-300">
-              {journey.opening_hook || quick.personality || "Compare this with your real life before moving into the future section."}
-            </p>
-            <div className="mt-5 flex flex-col gap-2 sm:flex-row">
-              {["Feels accurate", "Partly true", "Show more"].map((label) => (
-                <ActionButton key={label} active={resonance === label} onClick={() => setResonance(label)}>
-                  {label}
-                </ActionButton>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid gap-3 md:grid-cols-3">
-            {checks.slice(0, 3).map((check, index) => (
-              <InsightCard
-                key={`${check.label}-${index}`}
-                eyebrow={check.label}
-                title={check.statement}
-                body={<p>{check.why_it_matters}</p>}
-                tone={["cyan", "violet", "emerald"][index]}
-              />
-            ))}
-          </div>
-        </div>
-
-        <aside className="rounded-lg border border-white/10 bg-black/20 p-4">
-          <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wide text-slate-400">
-            <span>Reading path</span>
-            <span>{selectedIndex + 1}/{sections.length}</span>
-          </div>
-          <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
-            <div className="h-full rounded-full bg-cyan-300 transition-all" style={{ width: `${progress}%` }} />
-          </div>
-          <div className="mt-4 space-y-2">
-            {sections.map((section, index) => (
-              <button
-                key={`${section.title}-${index}`}
-                type="button"
-                onClick={() => setSelectedIndex(index)}
-                className={`w-full rounded-lg border p-3 text-left transition ${
-                  selectedIndex === index
-                    ? "border-cyan-300 bg-cyan-300 text-slate-950"
-                    : "border-white/10 bg-white/[0.04] text-slate-300 hover:border-white/25 hover:text-white"
-                }`}
-              >
-                <span className="block text-xs font-bold uppercase tracking-wide opacity-70">Chapter {index + 1}</span>
-                <span className="mt-1 block text-sm font-bold">{section.category}</span>
-              </button>
-            ))}
-          </div>
-        </aside>
-      </div>
-
-      <article className="mt-5 rounded-lg border border-white/10 bg-white/[0.045] p-5">
-        <p className="text-xs font-bold uppercase tracking-wide text-cyan-200">{activeSection.category}</p>
-        <h3 className="mt-2 text-2xl font-bold text-white">{activeSection.title}</h3>
-        <p className="mt-2 text-sm leading-6 text-slate-300">{activeSection.hook}</p>
-        <div className="mt-5 grid gap-3 md:grid-cols-2">
-          {clean(activeSection.insights).map((insight, index) => (
-            <div key={index} className="rounded-lg border border-white/10 bg-black/20 p-4 text-sm leading-7 text-slate-200">
-              <span className="mr-2 inline-grid h-6 w-6 place-items-center rounded-md bg-white/10 text-xs font-bold text-white">
-                {index + 1}
-              </span>
-              {insight}
-            </div>
-          ))}
-        </div>
-        {activeSection.action && (
-          <div className="mt-4 rounded-lg border border-amber-200/30 bg-amber-300/10 p-4 text-sm leading-7 text-amber-50">
-            <span className="font-bold text-white">Next step: </span>
-            {activeSection.action}
-          </div>
-        )}
-      </article>
-    </SectionShell>
-  );
-}
-
-function FutureSection({ report, onOpenRemedies }) {
-  const forecast = report.forecast || {};
-  const current = report.current_transits || {};
-  const money = report.money_and_wealth || {};
-  const career = report.career_and_education || {};
-  const love = report.love_and_relationships || {};
-
-  const timeline = [
-    {
-      label: "Next 7 days",
-      title: "Immediate energy",
-      body: forecast.next_7_days,
-      action: current.avoid_now ? `Avoid: ${current.avoid_now}` : "Keep decisions simple and observe the pattern.",
-      tone: "cyan",
-    },
-    {
-      label: "Next 30 days",
-      title: "Main opportunity window",
-      body: forecast.next_30_days || report.quick_summary?.next_30_days_highlight,
-      action: current.focus_now ? `Focus: ${current.focus_now}` : "Choose one priority and stay consistent.",
-      tone: "amber",
-    },
-    {
-      label: "Next 6 months",
-      title: "Growth direction",
-      body: forecast.next_6_months,
-      action: career.growth_periods || money.wealth_growth_timeline,
-      tone: "emerald",
-    },
-  ];
-
-  return (
-    <SectionShell
-      eyebrow="Most important section"
-      title="Your future timeline"
-      subtitle="A clear view of what to expect, what to focus on, and what to avoid. This is the part users come back for."
-      action={<ActionButton tone="gold" onClick={onOpenRemedies}>Get Remedies</ActionButton>}
-    >
-      <div className="grid gap-4 lg:grid-cols-3">
-        {timeline.map((item) => (
-          <InsightCard
-            key={item.label}
-            eyebrow={item.label}
-            title={item.title}
-            body={<p>{item.body || "Prediction will appear after a fresh report is generated."}</p>}
-            action={item.action}
-            tone={item.tone}
-          />
-        ))}
-      </div>
-
-      <div className="mt-5 grid gap-4 lg:grid-cols-3">
-        <InsightCard
-          eyebrow="Career"
-          title="Where progress can open"
-          body={
-            <>
-              {field("Direction", career.job_or_business)}
-              {field("Best fields", career.best_fields?.join(", "))}
-            </>
-          }
-          action={career.skill_recommendations?.join(", ")}
-          tone="sky"
-        />
-        <InsightCard
-          eyebrow="Money"
-          title="How wealth growth may behave"
-          body={
-            <>
-              {field("Earning style", money.earning_style)}
-              {field("Spending pattern", money.spending_pattern)}
-            </>
-          }
-          action={money.wealth_growth_timeline}
-          tone="emerald"
-        />
-        <InsightCard
-          eyebrow="Love"
-          title="Relationship timing and pattern"
-          body={
-            <>
-              {field("Pattern", love.relationship_pattern)}
-              {field("Timing hint", love.marriage_timing_hint)}
-            </>
-          }
-          action={love.red_flags}
-          tone="rose"
-        />
-      </div>
-    </SectionShell>
-  );
-}
-
-function LifeAreas({ report }) {
   const personality = report.personality_and_mindset || {};
-  const strengths = report.strengths_and_weaknesses || {};
   const career = report.career_and_education || {};
   const love = report.love_and_relationships || {};
   const money = report.money_and_wealth || {};
   const health = report.health_and_lifestyle || {};
+  const forecast = report.forecast || {};
+  const current = report.current_transits || {};
+  const remedies = report.remedies || {};
+  const lucky = report.lucky_factors || {};
 
-  const areas = [
-    {
-      eyebrow: "Personality",
-      title: "How your mind works",
-      body: (
-        <>
-          {field("Nature", personality.nature)}
-          {field("Emotional pattern", personality.emotional_pattern)}
-          {field("Stress response", personality.stress_handling)}
-        </>
-      ),
-      action: personality.communication_style,
-      tone: "cyan",
+  return {
+    identity: flow.astrological_identity || {
+      title: "Your astrological identity",
+      core_signature: quick.personality || personality.nature,
+      chart_factors: clean([
+        summary.sun_sign && `Sun in ${summary.sun_sign}`,
+        summary.moon_sign && `Moon in ${summary.moon_sign}`,
+        summary.moon_nakshatra && `Moon nakshatra: ${summary.moon_nakshatra}`,
+      ]),
+      what_this_means: clean([
+        personality.emotional_pattern,
+        personality.communication_style,
+        personality.stress_handling,
+      ]),
+      user_hook: quick.strength,
     },
-    {
-      eyebrow: "Career",
-      title: "Best direction for work",
-      body: (
-        <>
-          {field("Best fields", career.best_fields?.join(", "))}
-          {field("Job or business", career.job_or_business)}
-        </>
-      ),
-      action: career.skill_recommendations?.join(", "),
-      tone: "amber",
+    past: flow.past_happenings || {
+      title: "Past patterns your chart may validate",
+      validation_points: [
+        {
+          area: "Personality",
+          likely_event: personality.emotional_pattern,
+          chart_reason: personality.stress_handling,
+          reflection_prompt: "Did this pattern repeat when pressure increased?",
+        },
+        {
+          area: "Education/Career",
+          likely_event: career.growth_periods,
+          chart_reason: career.job_or_business,
+          reflection_prompt: "Did direction become clearer after confusion or delay?",
+        },
+        {
+          area: "Love/Family",
+          likely_event: love.relationship_pattern,
+          chart_reason: love.partner_type,
+          reflection_prompt: "Did you notice this emotional pattern before trusting someone?",
+        },
+      ],
     },
-    {
-      eyebrow: "Love",
-      title: "Your relationship pattern",
-      body: (
-        <>
-          {field("Partner type", love.partner_type)}
-          {field("Pattern", love.relationship_pattern)}
-        </>
-      ),
-      action: love.red_flags,
-      tone: "rose",
+    future: flow.future_prediction || {
+      headline: quick.next_30_days_highlight || "Your next phase rewards clarity and consistent action.",
+      timeline: [
+        {
+          period: "Next 7 days",
+          prediction: forecast.next_7_days,
+          opportunity: current.focus_now,
+          watch_out: current.avoid_now,
+          best_action: "Keep decisions simple and observe what repeats.",
+        },
+        {
+          period: "Next 30 days",
+          prediction: forecast.next_30_days,
+          opportunity: quick.career_direction,
+          watch_out: money.spending_pattern,
+          best_action: current.focus_now,
+        },
+        {
+          period: "Next 6 months",
+          prediction: forecast.next_6_months,
+          opportunity: career.growth_periods || money.wealth_growth_timeline,
+          watch_out: love.red_flags,
+          best_action: clean(report.final_guidance)[0],
+        },
+      ],
     },
-    {
-      eyebrow: "Money",
-      title: "Earning and spending style",
-      body: (
-        <>
-          {field("Earning", money.earning_style)}
-          {field("Spending", money.spending_pattern)}
-        </>
-      ),
-      action: money.wealth_growth_timeline,
-      tone: "emerald",
+    departments: flow.departments?.length ? flow.departments : [
+      {
+        name: "Career",
+        insight: career.job_or_business,
+        past_pattern: career.growth_periods,
+        future_signal: quick.career_direction,
+        action: career.skill_recommendations?.join(", "),
+      },
+      {
+        name: "Education",
+        insight: career.best_fields?.join(", "),
+        past_pattern: "Your chart may show learning through pressure, comparison, or delayed clarity.",
+        future_signal: "Skills improve when you choose one direction and build depth.",
+        action: career.skill_recommendations?.join(", "),
+      },
+      {
+        name: "Love",
+        insight: love.partner_type,
+        past_pattern: love.relationship_pattern,
+        future_signal: love.marriage_timing_hint,
+        action: love.red_flags,
+      },
+      {
+        name: "Money",
+        insight: money.earning_style,
+        past_pattern: money.spending_pattern,
+        future_signal: money.wealth_growth_timeline,
+        action: "Track impulse spending and build one steady income skill.",
+      },
+      {
+        name: "Family",
+        insight: "Your chart may show emotional responsibility inside close relationships.",
+        past_pattern: "You may have carried more silently than people noticed.",
+        future_signal: "Clear boundaries can improve peace at home.",
+        action: "Speak clearly before resentment builds.",
+      },
+      {
+        name: "Health",
+        insight: health.weak_areas?.join(", "),
+        past_pattern: "Stress can show up physically when emotions stay unspoken.",
+        future_signal: "Lifestyle consistency will matter more than sudden changes.",
+        action: clean(health.lifestyle_advice)[0],
+      },
+    ],
+    remedy: flow.remedy_plan || {
+      priority: remedies.mindset_remedy || "Stability before speed",
+      daily_actions: clean(remedies.daily_habits),
+      mantra_or_focus: remedies.mantra,
+      avoid_this: current.avoid_now,
+      lucky_support: clean([
+        lucky.lucky_day && `Day: ${lucky.lucky_day}`,
+        lucky.lucky_color && `Color: ${lucky.lucky_color}`,
+        lucky.lucky_number && `Number: ${lucky.lucky_number}`,
+        lucky.lucky_direction && `Direction: ${lucky.lucky_direction}`,
+      ]).join(" | "),
     },
-    {
-      eyebrow: "Strengths",
-      title: "What to build on",
-      body: <ul className="space-y-2">{clean(strengths.strengths).slice(0, 3).map((item, index) => <li key={index}>{item}</li>)}</ul>,
-      action: clean(strengths.weaknesses)[0],
-      tone: "violet",
-    },
-    {
-      eyebrow: "Health",
-      title: "Lifestyle guidance",
-      body: (
-        <>
-          {field("Weak areas", health.weak_areas?.join(", "))}
-          <ul className="space-y-2">{clean(health.lifestyle_advice).slice(0, 2).map((item, index) => <li key={index}>{item}</li>)}</ul>
-        </>
-      ),
-      action: clean(health.lifestyle_advice)[2],
-      tone: "sky",
-    },
-  ];
+  };
+};
 
+function IdentityStep({ flow, summary, onNext }) {
   return (
-    <SectionShell
-      eyebrow="Life areas"
-      title="Clear guidance by category"
-      subtitle="Each area gives the user one insight, one pattern, and one practical next step."
-    >
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {areas.map((area) => (
-          <InsightCard key={area.eyebrow} {...area} />
-        ))}
+    <Panel>
+      <SectionHeader
+        eyebrow="Step 1 - Astrological self"
+        title={flow.identity.title || "Your astrological identity"}
+        subtitle="First the app reads the person behind the chart. This builds interest before asking the user to trust future predictions."
+        action={<PrimaryButton onClick={onNext}>Continue to Past Proof</PrimaryButton>}
+      />
+
+      <div className="mt-6 grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="rounded-lg border border-[#f8d66d]/35 bg-[#f8d66d]/10 p-5">
+          <p className="text-xs font-black uppercase tracking-wide text-[#f8d66d]">Core signature</p>
+          <p className="mt-3 text-2xl font-black leading-9 text-white">
+            {flow.identity.core_signature || "Your chart suggests a layered personality with private intensity and visible responsibility."}
+          </p>
+          {flow.identity.user_hook && <p className="mt-4 text-sm leading-7 text-[#f8efe0]">{flow.identity.user_hook}</p>}
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Metric label="Sun" value={summary.sun_sign} />
+          <Metric label="Moon" value={summary.moon_sign} />
+          <Metric label="Nakshatra" value={summary.moon_nakshatra} />
+          <Metric label="System" value={summary.zodiac_system} />
+        </div>
       </div>
-    </SectionShell>
+
+      <div className="mt-5 grid gap-4 lg:grid-cols-2">
+        <InfoCard eyebrow="Chart factors" title="Why this reading is personal" accent="mint">
+          <BulletList items={flow.identity.chart_factors} />
+        </InfoCard>
+        <InfoCard eyebrow="Meaning" title="How this can show up in life" accent="blue">
+          <BulletList items={flow.identity.what_this_means} />
+        </InfoCard>
+      </div>
+    </Panel>
   );
 }
 
-function Remedies({ report, onOpenFuture }) {
-  const remedies = report.remedies || {};
-  const lucky = report.lucky_factors || {};
-  const daily = clean(remedies.daily_habits);
+function PastStep({ flow, checkedPast, setCheckedPast, onNext }) {
+  const points = flow.past.validation_points || [];
+  const accuracy = points.length ? Math.round((checkedPast.length / points.length) * 100) : 0;
 
   return (
-    <SectionShell
-      eyebrow="Remedies"
-      title="Simple actions for daily alignment"
-      subtitle="Remedies should feel practical, memorable, and easy to repeat."
-      action={<ActionButton tone="gold" onClick={onOpenFuture}>Review Future</ActionButton>}
-    >
-      <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="grid gap-3">
-          {daily.map((habit, index) => (
-            <div key={index} className="flex gap-3 rounded-lg border border-white/10 bg-white/[0.045] p-4">
-              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-cyan-300 text-sm font-black text-slate-950">
-                {index + 1}
-              </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Daily habit</p>
-                <p className="mt-1 text-sm leading-6 text-white">{habit}</p>
-              </div>
-            </div>
-          ))}
-          <InsightCard
-            eyebrow="Mindset remedy"
-            title={remedies.mindset_remedy || "Stay steady before reacting"}
-            body={<p>{remedies.donation_or_service || "A small act of service can help turn pressure into grounded action."}</p>}
-            action={remedies.mantra}
-            tone="amber"
-          />
-        </div>
+    <Panel>
+      <SectionHeader
+        eyebrow="Step 2 - Past validation"
+        title={flow.past.title || "Past happenings your chart may remember"}
+        subtitle="The user should feel, 'this app understands what has already happened.' That is the trust bridge before future prediction."
+        action={<PrimaryButton onClick={onNext}>Reveal Future</PrimaryButton>}
+      />
 
-        <div className="rounded-lg border border-white/10 bg-black/20 p-5">
-          <p className="text-xs font-bold uppercase tracking-wide text-cyan-200">Lucky factors</p>
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            {[
-              ["Day", lucky.lucky_day],
-              ["Color", lucky.lucky_color],
-              ["Number", lucky.lucky_number],
-              ["Direction", lucky.lucky_direction],
-            ].map(([label, value]) => (
-              <div key={label} className="rounded-lg border border-white/10 bg-white/[0.05] p-4">
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-400">{label}</p>
-                <p className="mt-2 text-lg font-bold text-white">{value || "-"}</p>
-              </div>
-            ))}
+      <div className="mt-6 rounded-lg border border-white/10 bg-black/20 p-4">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-xs font-black uppercase tracking-wide text-white/45">Resonance meter</p>
+            <p className="mt-1 text-xl font-black text-white">{accuracy}% matched</p>
+          </div>
+          <div className="h-3 w-40 overflow-hidden rounded-full bg-white/10">
+            <div className="h-full rounded-full bg-[#5eead4] transition-all" style={{ width: `${accuracy}%` }} />
           </div>
         </div>
       </div>
-    </SectionShell>
+
+      <div className="mt-5 grid gap-4 lg:grid-cols-3">
+        {points.map((point, index) => {
+          const checked = checkedPast.includes(index);
+          return (
+            <button
+              key={`${point.area}-${index}`}
+              type="button"
+              onClick={() => {
+                setCheckedPast((prev) => (
+                  prev.includes(index) ? prev.filter((item) => item !== index) : [...prev, index]
+                ));
+              }}
+              className={`rounded-lg border p-4 text-left transition ${
+                checked
+                  ? "border-[#5eead4] bg-[#5eead4]/15"
+                  : `${accentClasses[getAccent(index)]} hover:border-white/35`
+              }`}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-black uppercase tracking-wide text-white/50">{point.area}</p>
+                <span className={`rounded-md px-2 py-1 text-xs font-black ${checked ? "bg-[#5eead4] text-[#171014]" : "bg-white/10 text-white"}`}>
+                  {checked ? "Matched" : "Check"}
+                </span>
+              </div>
+              <h3 className="mt-3 text-lg font-black leading-tight text-white">{point.likely_event || "Past pattern unavailable"}</h3>
+              <p className="mt-3 text-sm leading-6 text-[#d8dde2]/80">{point.chart_reason}</p>
+              <p className="mt-4 rounded-lg border border-white/10 bg-black/20 p-3 text-sm leading-6 text-white">
+                {point.reflection_prompt}
+              </p>
+            </button>
+          );
+        })}
+      </div>
+    </Panel>
+  );
+}
+
+function FutureStep({ flow, activePeriod, setActivePeriod, onNext }) {
+  const timeline = flow.future.timeline || [];
+  const active = timeline[activePeriod] || timeline[0] || {};
+
+  return (
+    <Panel>
+      <SectionHeader
+        eyebrow="Step 3 - Future prediction"
+        title={flow.future.headline || "Your future timeline"}
+        subtitle="This section is intentionally direct: what may happen, where opportunity opens, what to avoid, and what to do."
+        action={<PrimaryButton onClick={onNext}>Open Life Areas</PrimaryButton>}
+      />
+
+      <div className="mt-6 grid gap-3 md:grid-cols-3">
+        {timeline.map((item, index) => (
+          <button
+            key={item.period}
+            type="button"
+            onClick={() => setActivePeriod(index)}
+            className={`rounded-lg border p-4 text-left transition ${
+              activePeriod === index
+                ? "border-[#f8d66d] bg-[#f8d66d] text-[#171014]"
+                : "border-white/10 bg-white/[0.055] text-white hover:border-[#f8d66d]/55"
+            }`}
+          >
+            <p className="text-xs font-black uppercase tracking-wide opacity-70">{item.period}</p>
+            <p className="mt-2 text-lg font-black leading-tight">{item.opportunity || item.prediction || "Prediction"}</p>
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-5 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="rounded-lg border border-[#f8d66d]/35 bg-[#f8d66d]/10 p-5">
+          <p className="text-xs font-black uppercase tracking-wide text-[#f8d66d]">{active.period || "Selected period"}</p>
+          <h3 className="mt-3 text-2xl font-black leading-9 text-white">{active.prediction || "Generate a fresh report to unlock this timing."}</h3>
+        </div>
+        <div className="grid gap-3">
+          <InfoCard eyebrow="Opportunity" title={active.opportunity || "Not available"} accent="green" />
+          <InfoCard eyebrow="Watch out" title={active.watch_out || "Not available"} accent="coral" />
+          <InfoCard eyebrow="Best action" title={active.best_action || "Not available"} accent="mint" />
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
+function DepartmentsStep({ flow, activeDepartment, setActiveDepartment, onNext }) {
+  const departments = flow.departments || [];
+  const active = departments[activeDepartment] || departments[0] || {};
+
+  return (
+    <Panel>
+      <SectionHeader
+        eyebrow="Step 4 - Departments"
+        title="Concise guidance for each life area"
+        subtitle="Each department gives one insight, one past pattern, one future signal, and one practical action."
+        action={<PrimaryButton onClick={onNext}>Get Remedies</PrimaryButton>}
+      />
+
+      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+        {departments.map((department, index) => (
+          <button
+            key={`${department.name}-${index}`}
+            type="button"
+            onClick={() => setActiveDepartment(index)}
+            className={`rounded-lg border p-3 text-left transition ${
+              activeDepartment === index
+                ? "border-[#5eead4] bg-[#5eead4] text-[#171014]"
+                : "border-white/10 bg-white/[0.055] text-white hover:border-[#5eead4]/60"
+            }`}
+          >
+            <span className="text-sm font-black">{department.name}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-5 grid gap-4 lg:grid-cols-4">
+        <InfoCard eyebrow={active.name} title="Insight" accent="mint">
+          <p>{active.insight || "Not available"}</p>
+        </InfoCard>
+        <InfoCard eyebrow={active.name} title="Past pattern" accent="blue">
+          <p>{active.past_pattern || "Not available"}</p>
+        </InfoCard>
+        <InfoCard eyebrow={active.name} title="Future signal" accent="gold">
+          <p>{active.future_signal || "Not available"}</p>
+        </InfoCard>
+        <InfoCard eyebrow={active.name} title="Action" accent="coral">
+          <p>{active.action || "Not available"}</p>
+        </InfoCard>
+      </div>
+
+      <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {departments.map((department, index) => (
+          <InfoCard
+            key={`${department.name}-summary-${index}`}
+            eyebrow="Quick view"
+            title={department.name}
+            accent={getAccent(index)}
+            action={department.action}
+          >
+            <p>{department.future_signal || department.insight}</p>
+          </InfoCard>
+        ))}
+      </div>
+    </Panel>
+  );
+}
+
+function RemediesStep({ flow, onRestart }) {
+  return (
+    <Panel>
+      <SectionHeader
+        eyebrow="Step 5 - Remedies"
+        title={flow.remedy.priority || "Your action plan"}
+        subtitle="The report ends with useful actions, not just reading material."
+        action={<PrimaryButton onClick={onRestart}>Review From Start</PrimaryButton>}
+      />
+
+      <div className="mt-6 grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="grid gap-3">
+          {clean(flow.remedy.daily_actions).map((action, index) => (
+            <div key={index} className="flex gap-3 rounded-lg border border-white/10 bg-white/[0.055] p-4">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-[#5eead4] text-sm font-black text-[#171014]">
+                {index + 1}
+              </div>
+              <p className="text-sm font-bold leading-6 text-white">{action}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid gap-4">
+          <InfoCard eyebrow="Focus" title={flow.remedy.mantra_or_focus || "Not available"} accent="gold" />
+          <InfoCard eyebrow="Avoid" title={flow.remedy.avoid_this || "Not available"} accent="coral" />
+          <InfoCard eyebrow="Lucky support" title={flow.remedy.lucky_support || "Not available"} accent="green" />
+        </div>
+      </div>
+    </Panel>
   );
 }
 
 function Report({ report }) {
-  const [activeTab, setActiveTab] = useState("future");
+  const [activeStep, setActiveStep] = useState("identity");
+  const [checkedPast, setCheckedPast] = useState([]);
+  const [activePeriod, setActivePeriod] = useState(1);
+  const [activeDepartment, setActiveDepartment] = useState(0);
 
-  const tabs = useMemo(() => [
-    { id: "future", label: "Future", hint: "Most used" },
-    { id: "reading", label: "Reading", hint: "Trust builder" },
-    { id: "life", label: "Life Areas", hint: "Guidance" },
-    { id: "remedies", label: "Remedies", hint: "Action" },
-  ], []);
+  const flow = useMemo(() => buildFlow(report || {}), [report]);
 
   if (!report) return null;
 
   const summary = report.chart_summary || {};
-  const quick = report.quick_summary || {};
+  const activeIndex = Math.max(steps.findIndex((step) => step.id === activeStep), 0);
+  const goNext = () => setActiveStep(steps[Math.min(activeIndex + 1, steps.length - 1)].id);
+  const restart = () => setActiveStep("identity");
 
   return (
-    <section className="space-y-5 sm:space-y-6">
-      <div className="overflow-hidden rounded-lg border border-white/10 bg-[#081114] shadow-2xl shadow-black/20">
-        <div className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[1fr_360px] lg:items-end">
+    <section className="space-y-5">
+      <div className="overflow-hidden rounded-lg border border-white/10 bg-[#171014] shadow-2xl shadow-black/25">
+        <div className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[1fr_380px] lg:items-end">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-cyan-200">AIstro personal prediction</p>
-            <h1 className="mt-3 max-w-3xl text-3xl font-black leading-tight text-white sm:text-4xl">
-              Your future timeline is ready
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-[#5eead4]">AIstro chart intelligence</p>
+            <h1 className="mt-3 max-w-4xl text-3xl font-black leading-tight text-white sm:text-5xl">
+              A personal reading built in the right order
             </h1>
-            <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300">
-              {quick.next_30_days_highlight || "Start with your prediction, then explore the reading, life areas, and remedies."}
+            <p className="mt-4 max-w-3xl text-base leading-7 text-[#d8dde2]/82">
+              First your astrological identity, then past validation, then future prediction, then department-wise actions.
             </p>
             <div className="mt-5 flex flex-col gap-2 sm:flex-row">
-              <ActionButton tone="gold" onClick={() => setActiveTab("future")}>View Future Prediction</ActionButton>
-              <ActionButton onClick={() => setActiveTab("remedies")}>Show Remedies</ActionButton>
+              <PrimaryButton onClick={() => setActiveStep("identity")}>Start Reading</PrimaryButton>
+              <PrimaryButton variant="secondary" onClick={() => setActiveStep("future")}>Jump to Future</PrimaryButton>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            {[
-              ["Sun", summary.sun_sign],
-              ["Moon", summary.moon_sign],
-              ["Nakshatra", summary.moon_nakshatra],
-              ["System", summary.zodiac_system],
-            ].map(([label, value]) => (
-              <div key={label} className="rounded-lg border border-white/10 bg-white/[0.045] px-3 py-3">
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">{label}</p>
-                <p className="mt-1 text-sm font-bold text-white">{value || "-"}</p>
-              </div>
-            ))}
+          <div className="grid grid-cols-2 gap-3">
+            <Metric label="Sun" value={summary.sun_sign} />
+            <Metric label="Moon" value={summary.moon_sign} />
+            <Metric label="Nakshatra" value={summary.moon_nakshatra} />
+            <Metric label="System" value={summary.zodiac_system} />
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 border-t border-white/10 bg-black/20 p-3 lg:grid-cols-4">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              className={`rounded-lg border p-3 text-left transition ${
-                activeTab === tab.id
-                  ? "border-cyan-300 bg-cyan-300 text-slate-950"
-                  : "border-white/10 bg-white/[0.04] text-slate-300 hover:border-white/25 hover:text-white"
-              }`}
-            >
-              <span className="block text-sm font-black">{tab.label}</span>
-              <span className="mt-1 block text-xs font-bold uppercase tracking-wide opacity-65">{tab.hint}</span>
-            </button>
-          ))}
+        <div className="border-t border-white/10 bg-black/20 p-3">
+          <div className="grid gap-2 md:grid-cols-5">
+            {steps.map((step, index) => (
+              <button
+                key={step.id}
+                type="button"
+                onClick={() => setActiveStep(step.id)}
+                className={`rounded-lg border p-3 text-left transition ${
+                  activeStep === step.id
+                    ? "border-[#f8d66d] bg-[#f8d66d] text-[#171014]"
+                    : index < activeIndex
+                      ? "border-[#5eead4]/35 bg-[#5eead4]/10 text-white hover:border-[#5eead4]/70"
+                      : "border-white/10 bg-white/[0.04] text-[#d8dde2] hover:border-white/30"
+                }`}
+              >
+                <span className="text-xs font-black uppercase tracking-wide opacity-70">Step {index + 1}</span>
+                <span className="mt-1 block text-sm font-black">{step.label}</span>
+                <span className="mt-1 block text-xs font-bold opacity-70">{step.hint}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {activeTab === "future" && <FutureSection report={report} onOpenRemedies={() => setActiveTab("remedies")} />}
-      {activeTab === "reading" && <ReadingSession report={report} onOpenFuture={() => setActiveTab("future")} />}
-      {activeTab === "life" && <LifeAreas report={report} />}
-      {activeTab === "remedies" && <Remedies report={report} onOpenFuture={() => setActiveTab("future")} />}
+      {activeStep === "identity" && <IdentityStep flow={flow} summary={summary} onNext={goNext} />}
+      {activeStep === "past" && (
+        <PastStep
+          flow={flow}
+          checkedPast={checkedPast}
+          setCheckedPast={setCheckedPast}
+          onNext={goNext}
+        />
+      )}
+      {activeStep === "future" && (
+        <FutureStep
+          flow={flow}
+          activePeriod={activePeriod}
+          setActivePeriod={setActivePeriod}
+          onNext={goNext}
+        />
+      )}
+      {activeStep === "departments" && (
+        <DepartmentsStep
+          flow={flow}
+          activeDepartment={activeDepartment}
+          setActiveDepartment={setActiveDepartment}
+          onNext={goNext}
+        />
+      )}
+      {activeStep === "remedies" && <RemediesStep flow={flow} onRestart={restart} />}
     </section>
   );
 }
