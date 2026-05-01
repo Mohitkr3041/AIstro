@@ -1,11 +1,10 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getBirthDetails } from "../services/birth.service";
 import { generateAstroReport } from "../services/astro.service";
 import { logoutUser } from "../services/auth.service";
 import Report from "../components/astro/Report";
 import ChatBox from "../components/chat/ChatBox";
-import heroImage from "../assets/hero.png";
 
 function Dashboard({ setIsAuthenticated = () => {} }) {
   const navigate = useNavigate();
@@ -76,13 +75,13 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
 
   if (loadingBirth) {
     return (
-      <div className="min-h-screen bg-[#100b12] px-4 py-8 text-white">
+      <div className="min-h-screen bg-[#f6f1e8] px-4 py-8 text-[#1f2937]">
         <div className="mx-auto max-w-6xl space-y-4">
-          <div className="h-40 animate-pulse rounded-lg bg-[#f8d66d]/10" />
+          <div className="h-40 animate-pulse rounded-lg bg-[#1e2a44]/10" />
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="h-28 animate-pulse rounded-lg bg-white/10" />
-            <div className="h-28 animate-pulse rounded-lg bg-white/10" />
-            <div className="h-28 animate-pulse rounded-lg bg-white/10" />
+            <div className="h-28 animate-pulse rounded-lg bg-[#2f8f83]/10" />
+            <div className="h-28 animate-pulse rounded-lg bg-[#f5b84b]/20" />
+            <div className="h-28 animate-pulse rounded-lg bg-[#e86f61]/10" />
           </div>
         </div>
       </div>
@@ -90,110 +89,107 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#100b12] text-white">
-      <div className="relative overflow-hidden border-b border-white/10">
-        <img
-          src={heroImage}
-          alt="Abstract astrology artwork"
-          className="absolute inset-0 h-full w-full object-cover opacity-16"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#100b12] via-[#171014]/92 to-[#14251f]/82" />
-        <div className="relative mx-auto max-w-6xl px-3 py-7 sm:px-4 sm:py-10">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-3xl">
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-[#5eead4]">AIstro chart intelligence</p>
-              <h1 className="mt-3 text-3xl font-black leading-tight sm:text-4xl md:text-5xl">Your Personal Astrology Reading</h1>
-              <p className="mt-3 max-w-2xl text-base leading-7 text-white/72">
-                A guided flow from chart identity to past validation, future timing, life departments, and remedies.
-              </p>
+    <div className="min-h-screen bg-[#f6f1e8] text-[#1f2937]">
+      <header className="sticky top-0 z-20 border-b border-[#ded6c8] bg-[#f6f1e8]/90 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="grid h-10 w-10 place-items-center rounded-lg bg-[#1e2a44] font-black text-white">
+              A
             </div>
-
-            <div className="grid gap-3 sm:flex sm:flex-wrap">
-              <button
-                onClick={() => navigate("/birth")}
-                className="rounded-lg border border-white/15 bg-white/10 px-4 py-3 text-sm font-bold text-white transition hover:border-[#5eead4]/70 hover:bg-[#5eead4]/10"
-              >
-                Edit Birth Details
-              </button>
-              <button
-                onClick={handleLogout}
-                className="rounded-lg bg-rose-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-rose-950/30 transition hover:bg-rose-400"
-              >
-                Logout
-              </button>
+            <div>
+              <p className="text-sm font-black text-[#1e2a44]">AIstro</p>
+              <p className="text-xs font-bold text-[#7b7166]">Personal astrology workspace</p>
             </div>
           </div>
 
-          <div className="mt-8 grid gap-3 md:grid-cols-3">
-            {[
-              ["Profile", birthData?.name || "Saved"],
-              ["Reading", report ? "Ready" : loadingReport ? "Generating" : "Pending"],
-              ["Flow", "Chart > Past > Future"],
-            ].map(([label, value]) => (
-              <div key={label} className="rounded-lg border border-white/10 bg-black/30 px-4 py-3 backdrop-blur">
-                <p className="text-xs font-black uppercase tracking-wide text-white/45">{label}</p>
-                <p className="mt-1 text-lg font-black text-white">{value}</p>
-              </div>
-            ))}
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => navigate("/birth")}
+              className="rounded-lg border border-[#d8d1c3] bg-white px-4 py-2 text-sm font-black text-[#1e2a44] shadow-sm transition hover:border-[#2f8f83] hover:text-[#2f8f83]"
+            >
+              Edit Birth Details
+            </button>
+            <button
+              onClick={handleLogout}
+              className="rounded-lg border border-[#e86f61]/25 bg-[#e86f61]/10 px-4 py-2 text-sm font-black text-[#9f342b] transition hover:bg-[#e86f61]/15"
+            >
+              Logout
+            </button>
           </div>
         </div>
-      </div>
+      </header>
 
-      <main className="mx-auto max-w-6xl space-y-8 px-3 py-6 sm:px-4 sm:py-8">
+      <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:py-8">
+        <section className="overflow-hidden rounded-lg border border-[#ded6c8] bg-white shadow-2xl shadow-[#1e2a44]/10">
+          <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
+            <div className="p-5 sm:p-7 lg:p-8">
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-[#2f8f83]">Your reading hub</p>
+              <h1 className="mt-3 max-w-3xl text-4xl font-black leading-tight text-[#1e2a44] sm:text-5xl">
+                Decode the past, understand the present, and plan the future.
+              </h1>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-[#6b6258]">
+                Your dashboard keeps the structured astrology reading first, with chat as a focused companion.
+              </p>
+
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <button
+                  onClick={() => generateReportData(true)}
+                  disabled={loadingReport}
+                  className="rounded-lg bg-[#e86f61] px-5 py-3 text-sm font-black text-white shadow-lg shadow-[#e86f61]/20 transition hover:bg-[#d85d50] disabled:opacity-60"
+                >
+                  {loadingReport ? "Generating..." : "Generate Fresh Reading"}
+                </button>
+                <button
+                  onClick={() => navigate("/birth")}
+                  className="rounded-lg border border-[#d8d1c3] bg-[#fbf8f2] px-5 py-3 text-sm font-black text-[#1e2a44] transition hover:border-[#2f8f83] hover:text-[#2f8f83]"
+                >
+                  Update Chart Input
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-[#1e2a44] p-5 text-white sm:p-7 lg:p-8">
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f5b84b]">Chart input</p>
+              <div className="mt-5 grid gap-3">
+                {[
+                  ["Name", birthData?.name],
+                  ["Date", birthData?.dob],
+                  ["Time", birthData?.tob],
+                  ["Place", birthData?.place],
+                ].map(([label, value]) => (
+                  <div key={label} className="rounded-lg border border-white/12 bg-white/10 p-4">
+                    <p className="text-xs font-black uppercase tracking-wide text-white/45">{label}</p>
+                    <p className="mt-1 font-black text-white">{value || "-"}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
         {dashboardError && (
-          <div className="rounded-lg border border-red-300/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+          <div className="rounded-lg border border-[#e86f61]/30 bg-[#e86f61]/10 px-4 py-3 text-sm text-[#9f342b]">
             {dashboardError}
           </div>
         )}
 
         {notice && !reportError && (
-          <div className="rounded-lg border border-emerald-300/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
+          <div className="rounded-lg border border-[#2f8f83]/25 bg-[#2f8f83]/10 px-4 py-3 text-sm font-bold text-[#1f6f66]">
             {notice}
           </div>
         )}
 
-        {birthData && (
-          <section className="rounded-lg border border-white/10 bg-[#171014] p-5 shadow-xl shadow-black/20">
-            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm font-black uppercase tracking-wide text-[#5eead4]">Birth Details</p>
-                <h2 className="mt-1 text-2xl font-black">Your chart input</h2>
-              </div>
-              <button
-                onClick={() => generateReportData(true)}
-                disabled={loadingReport}
-                className="w-full rounded-lg border border-[#f8d66d] bg-[#f8d66d] px-4 py-2 text-sm font-black text-[#171014] shadow-lg shadow-[#f8d66d]/20 transition hover:bg-[#ffe58a] disabled:opacity-60 sm:w-auto"
-              >
-                {loadingReport ? "Generating..." : "Generate Fresh Reading"}
-              </button>
-            </div>
-            <div className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                ["Name", birthData.name],
-                ["Date", birthData.dob],
-                ["Time", birthData.tob],
-                ["Place", birthData.place],
-              ].map(([label, value]) => (
-                <div key={label} className="rounded-lg border border-white/10 bg-black/20 px-3 py-3">
-                  <p className="text-xs font-black uppercase tracking-wide text-white/45">{label}</p>
-                  <p className="mt-1 font-bold text-white">{value}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
         {loadingReport ? (
           <section className="grid gap-4 lg:grid-cols-2">
-            <div className="h-56 animate-pulse rounded-lg bg-[#f8d66d]/10" />
-            <div className="h-56 animate-pulse rounded-lg bg-[#5eead4]/10" />
+            <div className="h-56 animate-pulse rounded-lg bg-[#1e2a44]/10" />
+            <div className="h-56 animate-pulse rounded-lg bg-[#f5b84b]/20" />
           </section>
         ) : reportError ? (
-          <section className="rounded-lg border border-red-300/30 bg-red-500/10 p-6 text-center">
-            <p className="mb-4 text-red-100">{reportError}</p>
+          <section className="rounded-lg border border-[#e86f61]/30 bg-white p-6 text-center shadow-xl shadow-[#1e2a44]/10">
+            <p className="mb-4 text-[#9f342b]">{reportError}</p>
             <button
               onClick={generateReportData}
-              className="rounded-lg border border-[#f8d66d] bg-[#f8d66d] px-5 py-3 font-black text-[#171014] transition hover:bg-[#ffe58a]"
+              className="rounded-lg bg-[#e86f61] px-5 py-3 font-black text-white transition hover:bg-[#d85d50]"
             >
               Try Again
             </button>
@@ -209,4 +205,3 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
 }
 
 export default Dashboard;
-

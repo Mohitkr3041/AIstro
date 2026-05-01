@@ -73,12 +73,12 @@ function BirthForm() {
     }
   };
 
-  const inputClass = "w-full rounded-lg border border-white/15 bg-white/10 p-3 text-white placeholder-white/40 outline-none transition focus:border-teal-300";
+  const inputClass = "w-full rounded-lg border border-[#d8d1c3] bg-[#fbf8f2] px-4 py-3 text-[#1f2937] shadow-sm outline-none transition placeholder:text-[#8b8174] focus:border-[#2f8f83] focus:bg-white focus:ring-4 focus:ring-[#2f8f83]/15";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="rounded-lg border border-red-300/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+        <div className="rounded-lg border border-[#e86f61]/30 bg-[#e86f61]/10 px-4 py-3 text-sm text-[#9f342b]">
           {error}
         </div>
       )}
@@ -124,7 +124,7 @@ function BirthForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-lg bg-teal-300 py-3 font-semibold text-black transition hover:bg-teal-200 disabled:opacity-70"
+        className="w-full rounded-lg bg-[#e86f61] py-3 font-black text-white shadow-lg shadow-[#e86f61]/20 transition hover:bg-[#d85d50] disabled:opacity-70"
       >
         {loading ? "Saving..." : "Save & Continue"}
       </button>

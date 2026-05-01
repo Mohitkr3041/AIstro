@@ -3,17 +3,55 @@ import Message from "./Message";
 import ChatInput from "./ChatInput";
 import { askAstroChat, getChatHistory } from "../../services/chat.service";
 
-const suggestions = [
-  "Explain my next 30 days from this chart",
-  "Which past pattern should I pay attention to?",
-  "Give me a career action plan from my report",
-  "Turn my remedies into a daily routine",
+const modes = [
+  {
+    id: "future",
+    label: "Future",
+    helper: "Timing, opportunity, warning",
+    suggestions: [
+      "Explain my next 30 days in simple words",
+      "What should I avoid in the next 6 months?",
+      "What is the best action for my future prediction?",
+    ],
+  },
+  {
+    id: "past",
+    label: "Past",
+    helper: "Validate what already happened",
+    suggestions: [
+      "Which past pattern is strongest in my chart?",
+      "Explain my career or education past pattern",
+      "What emotional pattern may have repeated before?",
+    ],
+  },
+  {
+    id: "career",
+    label: "Career",
+    helper: "Work, skill, direction",
+    suggestions: [
+      "Give me a career action plan from my report",
+      "Which skills should I focus on now?",
+      "Job or business: what suits my chart better?",
+    ],
+  },
+  {
+    id: "remedies",
+    label: "Remedies",
+    helper: "Daily actions and focus",
+    suggestions: [
+      "Turn my remedies into a daily routine",
+      "What should I do today according to my chart?",
+      "Explain my lucky factors practically",
+    ],
+  },
 ];
 
 function ChatBox({ birthData }) {
   const messagesEndRef = useRef(null);
+  const [activeMode, setActiveMode] = useState("future");
+  const activeModeConfig = modes.find((mode) => mode.id === activeMode) || modes[0];
   const welcomeMessage = useMemo(() => ({
-    text: `Hello ${birthData?.name || "friend"}, ask me to explain any part of your reading.`,
+    text: `Hello ${birthData?.name || "friend"}, choose a focus above and I will explain your reading in a clearer way.`,
     sender: "ai",
   }), [birthData?.name]);
 
@@ -68,7 +106,7 @@ function ChatBox({ birthData }) {
 
     try {
       setLoading(true);
-      const res = await askAstroChat(userMessage);
+      const res = await askAstroChat(userMessage, activeMode);
       const savedMessages = res.data.data;
 
       setMessages(
@@ -92,46 +130,78 @@ function ChatBox({ birthData }) {
   };
 
   return (
-    <section className="min-w-0 overflow-hidden rounded-lg border border-white/10 bg-[#171014] shadow-2xl shadow-black/25">
-      <div className="border-b border-white/10 bg-black/20 p-5 sm:p-6">
+    <section className="min-w-0 overflow-hidden rounded-lg border border-[#ded6c8] bg-white shadow-2xl shadow-[#1e2a44]/10">
+      <div className="border-b border-[#ded6c8] bg-[#fbf8f2] p-5 sm:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-[#5eead4]">AIstro companion</p>
-            <h2 className="mt-2 text-2xl font-black text-white">Ask deeper about this reading</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/65">
-              This is the support layer: users can ask why, timing, remedies, or how to act on a prediction.
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-[#2f8f83]">AIstro companion</p>
+            <h2 className="mt-2 text-2xl font-black text-[#1e2a44]">Ask about your reading</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6b6258]">
+              Use chat to understand the report, not replace it. Pick a focus and ask follow-up questions.
             </p>
           </div>
-          <div className="w-fit rounded-lg border border-white/10 bg-white/[0.055] px-3 py-2 text-sm font-bold text-white/65">
+          <div className="w-fit rounded-lg border border-[#d8d1c3] bg-white px-3 py-2 text-sm font-bold text-[#6b6258]">
             {messages.filter((msg) => msg.sender === "user").length} saved questions
           </div>
         </div>
       </div>
 
       <div className="p-4 sm:p-5">
-        <div className="mb-4 flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch]">
-          {suggestions.map((suggestion) => (
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          {modes.map((mode) => (
             <button
-              key={suggestion}
+              key={mode.id}
               type="button"
-              onClick={() => handleSend(suggestion)}
-              disabled={loading || loadingHistory}
-              className="shrink-0 rounded-lg border border-white/12 bg-white/[0.055] px-3 py-2 text-sm font-bold text-white/75 transition hover:border-[#5eead4]/70 hover:bg-[#5eead4]/10 hover:text-white disabled:opacity-50"
+              onClick={() => setActiveMode(mode.id)}
+              className={`rounded-lg border p-3 text-left transition ${
+                activeMode === mode.id
+                  ? "border-[#1e2a44] bg-[#1e2a44] text-white"
+                  : "border-[#d8d1c3] bg-[#fbf8f2] text-[#1f2937] hover:border-[#2f8f83] hover:text-[#2f8f83]"
+              }`}
             >
-              {suggestion}
+              <span className="block text-sm font-black">{mode.label}</span>
+              <span className="mt-1 block text-xs font-bold opacity-70">{mode.helper}</span>
             </button>
           ))}
         </div>
 
-        <div className="min-w-0 rounded-lg border border-white/10 bg-black/25 p-3 sm:p-4">
+        <div className="mt-4 rounded-lg border border-[#ded6c8] bg-[#fbf8f2] p-3">
+          <p className="mb-3 text-xs font-black uppercase tracking-wide text-[#8b8174]">
+            Suggested questions for {activeModeConfig.label}
+          </p>
+          <div className="flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch]">
+            {activeModeConfig.suggestions.map((suggestion) => (
+              <button
+                key={suggestion}
+                type="button"
+                onClick={() => handleSend(suggestion)}
+                disabled={loading || loadingHistory}
+                className="shrink-0 rounded-lg border border-[#d8d1c3] bg-white px-3 py-2 text-sm font-bold text-[#6b6258] transition hover:border-[#2f8f83] hover:text-[#2f8f83] disabled:opacity-50"
+              >
+                {suggestion}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-4 min-w-0 rounded-lg border border-[#ded6c8] bg-[#fbf8f2] p-3 sm:p-4">
           <div className="mb-4 max-h-[24rem] space-y-3 overflow-y-auto pr-1 sm:max-h-[28rem] sm:pr-2">
             {loadingHistory && (
-              <p className="text-sm text-white/60">Loading chat history...</p>
+              <p className="text-sm text-[#6b6258]">Loading chat history...</p>
             )}
 
             {historyError && (
-              <div className="rounded-lg border border-[#ff7a7a]/40 bg-[#ff7a7a]/10 px-4 py-3 text-sm text-red-100">
+              <div className="rounded-lg border border-[#e86f61]/30 bg-[#e86f61]/10 px-4 py-3 text-sm text-[#9f342b]">
                 {historyError}
+              </div>
+            )}
+
+            {!loadingHistory && messages.length === 1 && (
+              <div className="rounded-lg border border-[#2f8f83]/25 bg-[#2f8f83]/10 p-4">
+                <p className="text-sm font-black text-[#1e2a44]">Start with a focused question</p>
+                <p className="mt-1 text-sm leading-6 text-[#6b6258]">
+                  Ask about future timing, past proof, career, or remedies.
+                </p>
               </div>
             )}
 
@@ -140,12 +210,16 @@ function ChatBox({ birthData }) {
             ))}
 
             {loading && (
-              <Message text="Reading the chart context and shaping a reply..." sender="ai" />
+              <Message text="Checking your saved reading and shaping a focused answer..." sender="ai" />
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          <ChatInput onSend={handleSend} loading={loading || loadingHistory} />
+          <ChatInput
+            onSend={handleSend}
+            loading={loading || loadingHistory}
+            activeModeLabel={activeModeConfig.label}
+          />
         </div>
       </div>
     </section>
