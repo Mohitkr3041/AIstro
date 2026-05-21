@@ -362,7 +362,7 @@ Return only valid JSON.
     const aiResponse = await generateAstroReading(prompt, {
       maxAttempts: 3,
       generationConfig: {
-        maxOutputTokens: 4096,
+        maxOutputTokens: 8192,
         responseMimeType: "application/json",
         temperature: 0.7,
       },

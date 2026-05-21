@@ -188,7 +188,7 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
           <section className="rounded-lg border border-[#e86f61]/30 bg-white p-6 text-center shadow-xl shadow-[#1e2a44]/10">
             <p className="mb-4 text-[#9f342b]">{reportError}</p>
             <button
-              onClick={generateReportData}
+              onClick={() => generateReportData()}
               className="rounded-lg bg-[#e86f61] px-5 py-3 font-black text-white transition hover:bg-[#d85d50]"
             >
               Try Again

@@ -21,7 +21,10 @@ app.set("trust proxy", 1);
 
 app.use(cookieParser());
 
-const allowedOrigins = (process.env.CLIENT_ORIGIN || "https://a-istro.vercel.app")
+const allowedOrigins = (
+  process.env.CLIENT_ORIGIN ||
+  "http://localhost:5173,http://127.0.0.1:5173,https://a-istro.vercel.app"
+)
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
