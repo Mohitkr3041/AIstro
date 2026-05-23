@@ -139,38 +139,39 @@ const buildFlow = (report) => {
 function SectionTitle({ eyebrow, title, subtitle }) {
   return (
     <div className="mb-5">
-      <p className="text-xs font-black uppercase tracking-[0.18em] text-[#2f8f83]">{eyebrow}</p>
-      <h2 className="mt-2 text-2xl font-black leading-tight text-[#1e2a44] sm:text-3xl">{title}</h2>
-      {subtitle && <p className="mt-2 max-w-3xl text-sm leading-6 text-[#6b6258]">{subtitle}</p>}
+      <p className="aistro-kicker">{eyebrow}</p>
+      <h2 className="aistro-title mt-2 text-3xl sm:text-4xl">{title}</h2>
+      {subtitle && <p className="aistro-muted mt-2 max-w-3xl text-sm italic leading-6">{subtitle}</p>}
     </div>
   );
 }
 
-function ReadingCard({ children, className = "" }) {
+function ReadingCard({ children, className = "", ...props }) {
   return (
-    <section className={`rounded-lg border border-[#ded6c8] bg-white p-5 shadow-xl shadow-[#1e2a44]/8 sm:p-6 ${className}`}>
+    <section className={`aistro-card scroll-mt-24 ${className}`} {...props}>
       {children}
     </section>
   );
 }
 
-function MiniCard({ eyebrow, title, body, action, tone = "default" }) {
+function MiniCard({ eyebrow, title, body, action, tone = "default", children }) {
   const tones = {
-    default: "border-[#ded6c8] bg-[#fbf8f2]",
-    teal: "border-[#2f8f83]/25 bg-[#2f8f83]/10",
-    amber: "border-[#f5b84b]/35 bg-[#f5b84b]/15",
-    coral: "border-[#e86f61]/25 bg-[#e86f61]/10",
-    indigo: "border-[#1e2a44]/15 bg-[#1e2a44]/5",
+    default: "border-[rgba(212,175,55,0.16)] bg-black/25",
+    teal: "border-[rgba(39,174,96,0.26)] bg-[rgba(39,174,96,0.08)]",
+    amber: "border-[rgba(212,175,55,0.3)] bg-[rgba(212,175,55,0.08)]",
+    coral: "border-[rgba(192,57,43,0.28)] bg-[rgba(192,57,43,0.1)]",
+    indigo: "border-[rgba(155,89,182,0.3)] bg-[rgba(155,89,182,0.09)]",
   };
 
   return (
-    <article className={`h-full rounded-lg border p-4 ${tones[tone] || tones.default}`}>
-      {eyebrow && <p className="text-xs font-black uppercase tracking-wide text-[#8b8174]">{eyebrow}</p>}
-      <h3 className="mt-2 text-lg font-black leading-tight text-[#1e2a44]">{title || "Not available"}</h3>
-      {body && <p className="mt-3 text-sm leading-6 text-[#6b6258]">{body}</p>}
+    <article className={`h-full rounded-[6px] border p-4 ${tones[tone] || tones.default}`}>
+      {eyebrow && <p className="aistro-kicker text-[10px]">{eyebrow}</p>}
+      <h3 className="mt-2 text-xl font-semibold leading-tight text-[var(--gold-2)]">{title || "Not available"}</h3>
+      {body && <p className="aistro-muted mt-3 text-sm leading-6">{body}</p>}
+      {children}
       {action && (
-        <p className="mt-4 rounded-lg bg-white/75 p-3 text-sm leading-6 text-[#1f2937]">
-          <span className="font-black text-[#e86f61]">Action: </span>
+        <p className="mt-4 rounded-[4px] border border-[rgba(212,175,55,0.14)] bg-black/25 p-3 text-sm leading-6 text-[var(--parchment)]">
+          <span className="font-bold text-[var(--amethyst-2)]">Action: </span>
           {action}
         </p>
       )}
@@ -182,8 +183,8 @@ function BulletList({ items }) {
   return (
     <div className="grid gap-2">
       {clean(items).map((item, index) => (
-        <p key={index} className="rounded-lg border border-[#ded6c8] bg-[#fbf8f2] p-3 text-sm leading-6 text-[#1f2937]">
-          <span className="mr-2 inline-grid h-6 w-6 place-items-center rounded-md bg-[#1e2a44] text-xs font-black text-white">
+        <p key={index} className="rounded-[4px] border border-[rgba(212,175,55,0.14)] bg-black/25 p-3 text-sm leading-6 text-[var(--parchment)]">
+          <span className="mr-2 inline-grid h-6 w-6 place-items-center rounded-[3px] bg-[rgba(155,89,182,0.35)] text-xs font-bold text-[var(--gold-2)]">
             {index + 1}
           </span>
           {item}
@@ -208,14 +209,14 @@ function Report({ report }) {
 
   return (
     <section className="space-y-5">
-      <div className="overflow-hidden rounded-lg border border-[#ded6c8] bg-white shadow-2xl shadow-[#1e2a44]/10">
+      <div className="aistro-card">
         <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="p-5 sm:p-7">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-[#2f8f83]">Personal astrology reading</p>
-            <h1 className="mt-3 max-w-3xl text-4xl font-black leading-tight text-[#1e2a44] sm:text-5xl">
+          <div>
+            <p className="aistro-kicker">Personal Astrology Reading</p>
+            <h1 className="aistro-title mt-3 max-w-3xl text-5xl">
               Your chart decoded in a simple order.
             </h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-[#6b6258]">
+            <p className="aistro-muted mt-4 max-w-2xl text-base italic leading-7">
               First about you, then past validation, then future prediction, life areas, and remedies.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
@@ -224,7 +225,7 @@ function Report({ report }) {
                   key={item.id}
                   type="button"
                   onClick={() => scrollTo(item.id)}
-                  className="rounded-lg border border-[#d8d1c3] bg-[#fbf8f2] px-4 py-2 text-sm font-black text-[#1e2a44] transition hover:border-[#2f8f83] hover:text-[#2f8f83]"
+                  className="aistro-chip transition hover:border-[rgba(212,175,55,0.65)]"
                 >
                   {item.label}
                 </button>
@@ -232,16 +233,16 @@ function Report({ report }) {
             </div>
           </div>
 
-          <div className="grid gap-3 bg-[#1e2a44] p-5 text-white sm:p-7 sm:grid-cols-2">
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:mt-0">
             {[
               ["Sun", summary.sun_sign],
               ["Moon", summary.moon_sign],
               ["Nakshatra", summary.moon_nakshatra],
               ["System", summary.zodiac_system],
             ].map(([label, value]) => (
-              <div key={label} className="rounded-lg border border-white/12 bg-white/10 p-4">
-                <p className="text-xs font-black uppercase tracking-wide text-white/45">{label}</p>
-                <p className="mt-1 font-black text-white">{value || "-"}</p>
+              <div key={label} className="aistro-panel">
+                <p className="aistro-kicker text-[10px]">{label}</p>
+                <p className="mt-2 font-semibold text-[var(--parchment)]">{value || "-"}</p>
               </div>
             ))}
           </div>
@@ -255,13 +256,13 @@ function Report({ report }) {
           subtitle="A short, direct reading of the person behind the chart."
         />
         <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className="rounded-lg border border-[#f5b84b]/35 bg-[#f5b84b]/15 p-5">
-            <p className="text-xs font-black uppercase tracking-wide text-[#9a6415]">Core signature</p>
-            <p className="mt-3 text-2xl font-black leading-9 text-[#1e2a44]">
+          <div className="rounded-[6px] border border-[rgba(212,175,55,0.28)] bg-[rgba(212,175,55,0.08)] p-5">
+            <p className="aistro-kicker text-[10px]">Core Signature</p>
+            <p className="mt-3 text-2xl font-semibold leading-9 text-[var(--gold-2)]">
               {flow.identity.core_signature || "Your chart suggests a layered personality with private intensity and visible responsibility."}
             </p>
             {flow.identity.user_hook && (
-              <p className="mt-4 text-sm leading-7 text-[#6b6258]">{flow.identity.user_hook}</p>
+              <p className="aistro-muted mt-4 text-sm leading-7">{flow.identity.user_hook}</p>
             )}
           </div>
           <div className="grid gap-4">
@@ -295,7 +296,7 @@ function Report({ report }) {
         </div>
       </ReadingCard>
 
-      <ReadingCard id="future" className="border-[#f5b84b]/60">
+      <ReadingCard id="future" className="border-[rgba(212,175,55,0.4)]">
         <SectionTitle
           eyebrow="Future Prediction"
           title={flow.future.headline || "Your future timeline"}
@@ -307,10 +308,10 @@ function Report({ report }) {
               key={item.period}
               type="button"
               onClick={() => setActivePeriod(index)}
-              className={`rounded-lg border p-4 text-left transition ${
+              className={`rounded-[6px] border p-4 text-left transition ${
                 activePeriod === index
-                  ? "border-[#1e2a44] bg-[#1e2a44] text-white"
-                  : "border-[#ded6c8] bg-[#fbf8f2] text-[#1e2a44] hover:border-[#2f8f83]"
+                  ? "border-[rgba(212,175,55,0.52)] bg-[rgba(155,89,182,0.28)] text-[var(--gold-2)]"
+                  : "border-[rgba(212,175,55,0.16)] bg-black/25 text-[var(--parchment)] hover:border-[rgba(212,175,55,0.38)]"
               }`}
             >
               <p className="text-xs font-black uppercase tracking-wide opacity-70">{item.period}</p>
@@ -320,9 +321,9 @@ function Report({ report }) {
         </div>
 
         <div className="mt-5 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="rounded-lg border border-[#f5b84b]/40 bg-[#f5b84b]/15 p-5">
-            <p className="text-xs font-black uppercase tracking-wide text-[#9a6415]">{activeFuture.period}</p>
-            <h3 className="mt-3 text-2xl font-black leading-9 text-[#1e2a44]">
+          <div className="rounded-[6px] border border-[rgba(212,175,55,0.32)] bg-[rgba(212,175,55,0.08)] p-5">
+            <p className="aistro-kicker text-[10px]">{activeFuture.period}</p>
+            <h3 className="mt-3 text-2xl font-semibold leading-9 text-[var(--gold-2)]">
               {activeFuture.prediction || "Generate a fresh report to unlock this timing."}
             </h3>
           </div>
@@ -363,11 +364,11 @@ function Report({ report }) {
         <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="grid gap-3">
             {clean(flow.remedy.daily_actions).map((action, index) => (
-              <div key={index} className="flex gap-3 rounded-lg border border-[#ded6c8] bg-[#fbf8f2] p-4">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-[#2f8f83] font-black text-white">
+              <div key={index} className="flex gap-3 rounded-[6px] border border-[rgba(212,175,55,0.16)] bg-black/25 p-4">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[4px] bg-[rgba(39,174,96,0.28)] font-bold text-[#b9f6cb]">
                   {index + 1}
                 </span>
-                <p className="text-sm font-bold leading-6 text-[#1f2937]">{action}</p>
+                <p className="text-sm font-semibold leading-6 text-[var(--parchment)]">{action}</p>
               </div>
             ))}
           </div>

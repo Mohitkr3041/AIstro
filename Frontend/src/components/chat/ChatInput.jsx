@@ -28,14 +28,14 @@ function ChatInput({ onSend, loading, activeModeLabel = "Reading" }) {
         maxLength={1000}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="min-w-0 rounded-lg border border-[#d8d1c3] bg-white px-4 py-3 text-[#1f2937] outline-none transition placeholder:text-[#8b8174] focus:border-[#2f8f83] focus:ring-4 focus:ring-[#2f8f83]/15"
+        className="aistro-input min-w-0"
       />
       <button
         onClick={handleSend}
         disabled={loading || !message.trim()}
-        className="rounded-lg bg-[#e86f61] px-5 py-3 font-black text-white shadow-lg shadow-[#e86f61]/20 transition hover:bg-[#d85d50] disabled:opacity-60"
+        className="aistro-button-primary"
       >
-        {loading ? "Reading..." : "Ask"}
+        {loading ? "Reading" : "Ask"}
       </button>
     </div>
   );

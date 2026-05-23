@@ -23,18 +23,13 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
       setNotice("");
       const res = await generateAstroReport({ forceRefresh });
       setReport(res.data.data);
-      setNotice(
-        res.data.cached
-          ? "Loaded your saved astrology report."
-          : "Generated a fresh astrology report."
-      );
+      setNotice(res.data.cached ? "Loaded your saved astrology report." : "Generated a fresh astrology report.");
     } catch (error) {
-      const errorMessage =
+      setReportError(
         error.response?.data?.message ||
-        error.response?.data?.error ||
-        "Failed to generate report";
-
-      setReportError(errorMessage);
+          error.response?.data?.error ||
+          "Failed to generate report"
+      );
     } finally {
       setLoadingReport(false);
     }
@@ -75,43 +70,42 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
 
   if (loadingBirth) {
     return (
-      <div className="min-h-screen bg-[#f6f1e8] px-4 py-8 text-[#1f2937]">
-        <div className="mx-auto max-w-6xl space-y-4">
-          <div className="h-40 animate-pulse rounded-lg bg-[#1e2a44]/10" />
+      <div className="aistro-shell px-4 py-8">
+        <div className="aistro-container space-y-4">
+          <div className="h-48 animate-pulse rounded-[6px] border border-[rgba(212,175,55,0.16)] bg-white/5" />
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="h-28 animate-pulse rounded-lg bg-[#2f8f83]/10" />
-            <div className="h-28 animate-pulse rounded-lg bg-[#f5b84b]/20" />
-            <div className="h-28 animate-pulse rounded-lg bg-[#e86f61]/10" />
+            <div className="h-28 animate-pulse rounded-[6px] bg-[rgba(155,89,182,0.12)]" />
+            <div className="h-28 animate-pulse rounded-[6px] bg-[rgba(212,175,55,0.12)]" />
+            <div className="h-28 animate-pulse rounded-[6px] bg-[rgba(39,174,96,0.1)]" />
           </div>
         </div>
       </div>
     );
   }
 
+  const summary = report?.chart_summary || {};
+
   return (
-    <div className="min-h-screen bg-[#f6f1e8] text-[#1f2937]">
-      <header className="sticky top-0 z-20 border-b border-[#ded6c8] bg-[#f6f1e8]/90 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="aistro-shell">
+      <header className="sticky top-0 z-30 border-b border-[rgba(212,175,55,0.14)] bg-[rgba(4,2,10,0.82)] backdrop-blur-xl">
+        <div className="aistro-container flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-lg bg-[#1e2a44] font-black text-white">
+            <div className="grid h-11 w-11 place-items-center rounded-[4px] border border-[rgba(212,175,55,0.34)] bg-[rgba(212,175,55,0.06)] aistro-display text-[var(--gold-2)]">
               A
             </div>
             <div>
-              <p className="text-sm font-black text-[#1e2a44]">AIstro</p>
-              <p className="text-xs font-bold text-[#7b7166]">Personal astrology workspace</p>
+              <p className="aistro-kicker">AIstro</p>
+              <p className="aistro-muted text-sm italic">Personal astrology workspace</p>
             </div>
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => navigate("/birth")}
-              className="rounded-lg border border-[#d8d1c3] bg-white px-4 py-2 text-sm font-black text-[#1e2a44] shadow-sm transition hover:border-[#2f8f83] hover:text-[#2f8f83]"
-            >
-              Edit Birth Details
+            <button onClick={() => navigate("/birth")} className="aistro-button-secondary px-4 py-2">
+              Edit Birth
             </button>
             <button
               onClick={handleLogout}
-              className="rounded-lg border border-[#e86f61]/25 bg-[#e86f61]/10 px-4 py-2 text-sm font-black text-[#9f342b] transition hover:bg-[#e86f61]/15"
+              className="aistro-button border border-[rgba(192,57,43,0.34)] bg-[rgba(192,57,43,0.12)] px-4 py-2 text-[#ffc1ba]"
             >
               Logout
             </button>
@@ -119,78 +113,67 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:py-8">
-        <section className="overflow-hidden rounded-lg border border-[#ded6c8] bg-white shadow-2xl shadow-[#1e2a44]/10">
-          <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="p-5 sm:p-7 lg:p-8">
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-[#2f8f83]">Your reading hub</p>
-              <h1 className="mt-3 max-w-3xl text-4xl font-black leading-tight text-[#1e2a44] sm:text-5xl">
-                Decode the past, understand the present, and plan the future.
+      <main className="aistro-container space-y-6 py-6 sm:py-8">
+        <section className="aistro-card">
+          <div className="grid gap-7 lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
+            <div>
+              <p className="aistro-kicker">Your Reading Hub</p>
+              <h1 className="aistro-title mt-4 max-w-3xl text-5xl sm:text-6xl">
+                Decode the past, read the present, plan the future.
               </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-[#6b6258]">
-                Your dashboard keeps the structured astrology reading first, with chat as a focused companion.
+              <p className="aistro-muted mt-5 max-w-2xl text-lg italic leading-8">
+                Your structured reading comes first, with chat as a focused companion for timing, remedies, career, and relationship questions.
               </p>
 
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <button
-                  onClick={() => generateReportData(true)}
-                  disabled={loadingReport}
-                  className="rounded-lg bg-[#e86f61] px-5 py-3 text-sm font-black text-white shadow-lg shadow-[#e86f61]/20 transition hover:bg-[#d85d50] disabled:opacity-60"
-                >
-                  {loadingReport ? "Generating..." : "Generate Fresh Reading"}
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                <button onClick={() => generateReportData(true)} disabled={loadingReport} className="aistro-button-primary">
+                  {loadingReport ? "Generating" : "Generate Fresh Reading"}
                 </button>
-                <button
-                  onClick={() => navigate("/birth")}
-                  className="rounded-lg border border-[#d8d1c3] bg-[#fbf8f2] px-5 py-3 text-sm font-black text-[#1e2a44] transition hover:border-[#2f8f83] hover:text-[#2f8f83]"
-                >
+                <button onClick={() => navigate("/birth")} className="aistro-button-secondary">
                   Update Chart Input
                 </button>
               </div>
             </div>
 
-            <div className="bg-[#1e2a44] p-5 text-white sm:p-7 lg:p-8">
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f5b84b]">Chart input</p>
-              <div className="mt-5 grid gap-3">
-                {[
-                  ["Name", birthData?.name],
-                  ["Date", birthData?.dob],
-                  ["Time", birthData?.tob],
-                  ["Place", birthData?.place],
-                ].map(([label, value]) => (
-                  <div key={label} className="rounded-lg border border-white/12 bg-white/10 p-4">
-                    <p className="text-xs font-black uppercase tracking-wide text-white/45">{label}</p>
-                    <p className="mt-1 font-black text-white">{value || "-"}</p>
-                  </div>
-                ))}
-              </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                ["Name", birthData?.name],
+                ["Date", birthData?.dob],
+                ["Time", birthData?.tob],
+                ["Place", birthData?.place],
+                ["Sun", summary.sun_sign],
+                ["Moon", summary.moon_sign],
+              ].map(([label, value]) => (
+                <div key={label} className="aistro-panel">
+                  <p className="aistro-kicker text-[10px]">{label}</p>
+                  <p className="mt-2 break-words text-lg font-semibold text-[var(--parchment)]">{value || "-"}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
         {dashboardError && (
-          <div className="rounded-lg border border-[#e86f61]/30 bg-[#e86f61]/10 px-4 py-3 text-sm text-[#9f342b]">
+          <div className="rounded-[4px] border border-[rgba(192,57,43,0.4)] bg-[rgba(192,57,43,0.12)] px-4 py-3 text-sm text-[#ffc1ba]">
             {dashboardError}
           </div>
         )}
 
         {notice && !reportError && (
-          <div className="rounded-lg border border-[#2f8f83]/25 bg-[#2f8f83]/10 px-4 py-3 text-sm font-bold text-[#1f6f66]">
+          <div className="rounded-[4px] border border-[rgba(39,174,96,0.35)] bg-[rgba(39,174,96,0.1)] px-4 py-3 text-sm font-bold text-[#b9f6cb]">
             {notice}
           </div>
         )}
 
         {loadingReport ? (
           <section className="grid gap-4 lg:grid-cols-2">
-            <div className="h-56 animate-pulse rounded-lg bg-[#1e2a44]/10" />
-            <div className="h-56 animate-pulse rounded-lg bg-[#f5b84b]/20" />
+            <div className="h-56 animate-pulse rounded-[6px] border border-[rgba(212,175,55,0.16)] bg-white/5" />
+            <div className="h-56 animate-pulse rounded-[6px] border border-[rgba(212,175,55,0.16)] bg-white/5" />
           </section>
         ) : reportError ? (
-          <section className="rounded-lg border border-[#e86f61]/30 bg-white p-6 text-center shadow-xl shadow-[#1e2a44]/10">
-            <p className="mb-4 text-[#9f342b]">{reportError}</p>
-            <button
-              onClick={() => generateReportData()}
-              className="rounded-lg bg-[#e86f61] px-5 py-3 font-black text-white transition hover:bg-[#d85d50]"
-            >
+          <section className="aistro-card text-center">
+            <p className="mb-4 text-[#ffc1ba]">{reportError}</p>
+            <button onClick={() => generateReportData()} className="aistro-button-primary">
               Try Again
             </button>
           </section>

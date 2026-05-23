@@ -73,12 +73,12 @@ function BirthForm() {
     }
   };
 
-  const inputClass = "w-full rounded-lg border border-[#d8d1c3] bg-[#fbf8f2] px-4 py-3 text-[#1f2937] shadow-sm outline-none transition placeholder:text-[#8b8174] focus:border-[#2f8f83] focus:bg-white focus:ring-4 focus:ring-[#2f8f83]/15";
+  const inputClass = "aistro-input";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="rounded-lg border border-[#e86f61]/30 bg-[#e86f61]/10 px-4 py-3 text-sm text-[#9f342b]">
+        <div className="rounded-[4px] border border-[rgba(192,57,43,0.4)] bg-[rgba(192,57,43,0.12)] px-4 py-3 text-sm text-[#ffc1ba]">
           {error}
         </div>
       )}
@@ -124,7 +124,7 @@ function BirthForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-lg bg-[#e86f61] py-3 font-black text-white shadow-lg shadow-[#e86f61]/20 transition hover:bg-[#d85d50] disabled:opacity-70"
+        className="aistro-button-primary w-full"
       >
         {loading ? "Saving..." : "Save & Continue"}
       </button>
