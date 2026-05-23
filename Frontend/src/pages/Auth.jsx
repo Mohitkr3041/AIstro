@@ -160,7 +160,7 @@ function Auth({ setIsAuthenticated = () => {} }) {
               </p>
             </div>
 
-            <div className="mb-6 grid grid-cols-2 gap-1 rounded-[4px] border border-[rgba(212,175,55,0.16)] bg-black/30 p-1">
+            <div className="mb-6 grid grid-cols-2 gap-1 rounded-[4px] border border-[rgba(154,100,21,0.18)] bg-[rgba(255,248,232,0.74)] p-1">
               <button
                 type="button"
                 onClick={() => setIsLogin(true)}
@@ -185,8 +185,8 @@ function Auth({ setIsAuthenticated = () => {} }) {
               <div
                 className={`mb-5 rounded-[4px] border px-4 py-3 text-sm ${
                   status.type === "success"
-                    ? "border-[rgba(39,174,96,0.35)] bg-[rgba(39,174,96,0.1)] text-[#b9f6cb]"
-                    : "border-[rgba(192,57,43,0.4)] bg-[rgba(192,57,43,0.12)] text-[#ffc1ba]"
+                    ? "border-[rgba(35,118,74,0.28)] bg-[rgba(35,118,74,0.08)] text-[#1f6b44]"
+                    : "border-[rgba(180,59,47,0.32)] bg-[rgba(180,59,47,0.08)] text-[#8f2f26]"
                 }`}
               >
                 {status.message}

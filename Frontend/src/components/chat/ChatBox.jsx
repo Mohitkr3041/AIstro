@@ -156,7 +156,7 @@ function ChatBox({ birthData }) {
               className={`rounded-[6px] border p-3 text-left transition ${
                 activeMode === mode.id
                   ? "border-[rgba(212,175,55,0.52)] bg-[rgba(155,89,182,0.3)] text-[var(--gold-2)]"
-                  : "border-[rgba(212,175,55,0.16)] bg-black/25 text-[var(--parchment)] hover:border-[rgba(212,175,55,0.38)] hover:text-[var(--gold-2)]"
+                  : "border-[rgba(154,100,21,0.18)] bg-[rgba(255,248,232,0.66)] text-[var(--parchment)] hover:border-[rgba(154,100,21,0.4)] hover:text-[var(--gold-2)]"
               }`}
             >
               <span className="block text-sm font-bold">{mode.label}</span>
@@ -165,7 +165,7 @@ function ChatBox({ birthData }) {
           ))}
         </div>
 
-        <div className="mt-4 rounded-[6px] border border-[rgba(212,175,55,0.16)] bg-black/25 p-3">
+        <div className="mt-4 rounded-[6px] border border-[rgba(154,100,21,0.18)] bg-[rgba(255,248,232,0.66)] p-3">
           <p className="aistro-kicker mb-3 text-[10px]">
             Suggested questions for {activeModeConfig.label}
           </p>
@@ -176,7 +176,7 @@ function ChatBox({ birthData }) {
                 type="button"
                 onClick={() => handleSend(suggestion)}
                 disabled={loading || loadingHistory}
-                className="shrink-0 rounded-[4px] border border-[rgba(212,175,55,0.18)] bg-[rgba(212,175,55,0.06)] px-3 py-2 text-sm font-semibold text-[var(--muted)] transition hover:border-[rgba(212,175,55,0.5)] hover:text-[var(--gold-2)] disabled:opacity-50"
+                className="shrink-0 rounded-[4px] border border-[rgba(154,100,21,0.18)] bg-[rgba(255,252,245,0.76)] px-3 py-2 text-sm font-semibold text-[var(--muted)] transition hover:border-[rgba(154,100,21,0.44)] hover:text-[var(--gold-2)] disabled:opacity-50"
               >
                 {suggestion}
               </button>
@@ -184,21 +184,21 @@ function ChatBox({ birthData }) {
           </div>
         </div>
 
-        <div className="mt-4 min-w-0 rounded-[6px] border border-[rgba(212,175,55,0.16)] bg-black/25 p-3 sm:p-4">
+        <div className="mt-4 min-w-0 rounded-[6px] border border-[rgba(154,100,21,0.18)] bg-[rgba(255,248,232,0.66)] p-3 sm:p-4">
           <div className="mb-4 max-h-[24rem] space-y-3 overflow-y-auto pr-1 sm:max-h-[28rem] sm:pr-2">
             {loadingHistory && (
               <p className="aistro-muted text-sm">Loading chat history...</p>
             )}
 
             {historyError && (
-              <div className="rounded-[4px] border border-[rgba(192,57,43,0.4)] bg-[rgba(192,57,43,0.12)] px-4 py-3 text-sm text-[#ffc1ba]">
+              <div className="rounded-[4px] border border-[rgba(180,59,47,0.32)] bg-[rgba(180,59,47,0.08)] px-4 py-3 text-sm text-[#8f2f26]">
                 {historyError}
               </div>
             )}
 
             {!loadingHistory && messages.length === 1 && (
-              <div className="rounded-[6px] border border-[rgba(39,174,96,0.26)] bg-[rgba(39,174,96,0.08)] p-4">
-                <p className="text-sm font-bold text-[#b9f6cb]">Start with a focused question</p>
+              <div className="rounded-[6px] border border-[rgba(35,118,74,0.24)] bg-[rgba(35,118,74,0.07)] p-4">
+                <p className="text-sm font-bold text-[#1f6b44]">Start with a focused question</p>
                 <p className="aistro-muted mt-1 text-sm leading-6">
                   Ask about future timing, past proof, career, or remedies.
                 </p>

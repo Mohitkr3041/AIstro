@@ -3,7 +3,7 @@ import { Navigate } from "react-router-dom";
 function ProtectedRoute({ isAuthenticated, children }) {
   if (isAuthenticated === null) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+      <div className="aistro-shell flex min-h-screen items-center justify-center">
         Checking authentication...
       </div>
     );

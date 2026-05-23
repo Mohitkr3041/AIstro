@@ -6,21 +6,23 @@
 
 @layer base {
   :root {
-    --void: #04020a;
-    --abyss: #080514;
-    --deep: #0d0820;
-    --card: #110d22;
-    --card-2: #160f28;
-    --parchment: #f5e6c8;
-    --muted: rgba(245, 230, 200, 0.58);
-    --faint: rgba(245, 230, 200, 0.1);
-    --gold: #d4af37;
-    --gold-2: #f5d76e;
-    --amethyst: #9b59b6;
-    --amethyst-2: #c39bd3;
-    --ruby: #c0392b;
-    --sapphire: #2980b9;
-    --emerald: #27ae60;
+    --void: #fbf2df;
+    --abyss: #f4e4c6;
+    --deep: #ead2aa;
+    --card: #fffaf0;
+    --card-2: #f8ebd1;
+    --parchment: #24170b;
+    --muted: rgba(61, 42, 20, 0.68);
+    --faint: rgba(151, 100, 28, 0.13);
+    --gold: #9a6415;
+    --gold-2: #6f3f08;
+    --amethyst: #7c3f93;
+    --amethyst-2: #5f2f71;
+    --ruby: #b43b2f;
+    --sapphire: #1d668a;
+    --emerald: #23764a;
+    --surface: rgba(255, 250, 240, 0.86);
+    --surface-strong: rgba(255, 255, 250, 0.96);
   }
 
   html,
@@ -32,8 +34,8 @@
   body {
     overflow-x: hidden;
     background:
-      radial-gradient(circle at 20% 10%, rgba(155, 89, 182, 0.18), transparent 32rem),
-      radial-gradient(circle at 85% 15%, rgba(212, 175, 55, 0.12), transparent 28rem),
+      radial-gradient(circle at 18% 8%, rgba(124, 63, 147, 0.12), transparent 32rem),
+      radial-gradient(circle at 86% 14%, rgba(154, 100, 21, 0.15), transparent 28rem),
       linear-gradient(180deg, var(--abyss), var(--void));
     color: var(--parchment);
     font-family: "Crimson Text", Georgia, serif;
@@ -46,8 +48,8 @@
   }
 
   ::selection {
-    background: rgba(212, 175, 55, 0.28);
-    color: white;
+    background: rgba(154, 100, 21, 0.22);
+    color: var(--parchment);
   }
 }
 
@@ -55,10 +57,10 @@
   .aistro-shell {
     @apply relative min-h-screen overflow-hidden text-[var(--parchment)];
     background:
-      linear-gradient(rgba(212, 175, 55, 0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(212, 175, 55, 0.035) 1px, transparent 1px),
-      radial-gradient(circle at 50% -10%, rgba(212, 175, 55, 0.12), transparent 34rem),
-      linear-gradient(135deg, var(--abyss), var(--void) 58%, #090313);
+      linear-gradient(rgba(154, 100, 21, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(154, 100, 21, 0.06) 1px, transparent 1px),
+      radial-gradient(circle at 50% -10%, rgba(124, 63, 147, 0.12), transparent 34rem),
+      linear-gradient(135deg, #fff8ea, var(--void) 58%, #f2ddba);
     background-size: 64px 64px, 64px 64px, auto, auto;
   }
 
@@ -66,8 +68,8 @@
     content: "";
     @apply pointer-events-none fixed inset-0 z-0;
     background-image:
-      radial-gradient(circle, rgba(245, 215, 110, 0.58) 0 1px, transparent 1.5px),
-      radial-gradient(circle, rgba(195, 155, 211, 0.42) 0 1px, transparent 1.5px);
+      radial-gradient(circle, rgba(154, 100, 21, 0.28) 0 1px, transparent 1.5px),
+      radial-gradient(circle, rgba(124, 63, 147, 0.2) 0 1px, transparent 1.5px);
     background-position: 12px 18px, 42px 54px;
     background-size: 96px 96px, 140px 140px;
     opacity: 0.26;
@@ -84,7 +86,7 @@
 
   .aistro-title {
     @apply aistro-display font-bold leading-[1.05];
-    background: linear-gradient(180deg, #fff6d7 0%, var(--gold-2) 52%, var(--amethyst-2) 100%);
+    background: linear-gradient(180deg, #1f1308 0%, var(--gold-2) 52%, var(--amethyst-2) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -99,10 +101,10 @@
 
   .aistro-card {
     @apply relative overflow-hidden border p-5 shadow-2xl sm:p-6;
-    border-color: rgba(212, 175, 55, 0.22);
+    border-color: rgba(154, 100, 21, 0.24);
     border-radius: 6px;
-    background: linear-gradient(145deg, rgba(22, 15, 40, 0.96), rgba(9, 6, 22, 0.96));
-    box-shadow: 0 22px 80px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(245, 230, 200, 0.05);
+    background: linear-gradient(145deg, var(--surface-strong), var(--surface));
+    box-shadow: 0 22px 60px rgba(84, 51, 16, 0.13), inset 0 1px 0 rgba(255, 255, 255, 0.72);
   }
 
   .aistro-card::before,
@@ -130,25 +132,25 @@
 
   .aistro-panel {
     @apply rounded-[6px] border p-4;
-    border-color: rgba(212, 175, 55, 0.16);
-    background: rgba(0, 0, 0, 0.28);
+    border-color: rgba(154, 100, 21, 0.18);
+    background: rgba(255, 248, 232, 0.68);
   }
 
   .aistro-input {
     @apply w-full rounded-[4px] border px-4 py-3 outline-none transition;
-    border-color: rgba(212, 175, 55, 0.18);
-    background: rgba(0, 0, 0, 0.42);
+    border-color: rgba(154, 100, 21, 0.22);
+    background: rgba(255, 252, 245, 0.88);
     color: var(--parchment);
   }
 
   .aistro-input::placeholder {
-    color: rgba(245, 230, 200, 0.32);
+    color: rgba(61, 42, 20, 0.42);
     font-style: italic;
   }
 
   .aistro-input:focus {
-    border-color: rgba(195, 155, 211, 0.8);
-    box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.16), inset 0 0 18px rgba(155, 89, 182, 0.05);
+    border-color: rgba(124, 63, 147, 0.65);
+    box-shadow: 0 0 0 3px rgba(124, 63, 147, 0.13), inset 0 0 18px rgba(124, 63, 147, 0.04);
   }
 
   .aistro-button {
@@ -160,31 +162,31 @@
   .aistro-button-primary {
     @apply aistro-button text-white;
     background: linear-gradient(135deg, var(--amethyst), #6c3483 60%, #4a235a);
-    box-shadow: 0 0 28px rgba(155, 89, 182, 0.35), 0 0 70px rgba(155, 89, 182, 0.14);
+    box-shadow: 0 12px 28px rgba(124, 63, 147, 0.22);
   }
 
   .aistro-button-primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 0 38px rgba(155, 89, 182, 0.48), 0 0 90px rgba(155, 89, 182, 0.2);
+    box-shadow: 0 16px 34px rgba(124, 63, 147, 0.28);
   }
 
   .aistro-button-secondary {
     @apply aistro-button;
-    border: 1px solid rgba(212, 175, 55, 0.35);
+    border: 1px solid rgba(154, 100, 21, 0.28);
     color: var(--gold-2);
-    background: rgba(212, 175, 55, 0.06);
+    background: rgba(255, 248, 232, 0.72);
   }
 
   .aistro-button-secondary:hover {
-    border-color: rgba(212, 175, 55, 0.75);
-    box-shadow: 0 0 28px rgba(212, 175, 55, 0.16);
+    border-color: rgba(154, 100, 21, 0.52);
+    box-shadow: 0 12px 26px rgba(154, 100, 21, 0.11);
   }
 
   .aistro-chip {
     @apply inline-flex items-center rounded-[4px] border px-3 py-2 text-xs font-bold uppercase;
-    border-color: rgba(212, 175, 55, 0.24);
+    border-color: rgba(154, 100, 21, 0.24);
     color: var(--gold-2);
-    background: rgba(212, 175, 55, 0.06);
+    background: rgba(255, 248, 232, 0.72);
     font-family: "Cinzel", serif;
     letter-spacing: 0.12em;
   }

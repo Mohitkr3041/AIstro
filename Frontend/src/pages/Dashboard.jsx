@@ -51,7 +51,7 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
 
   return (
     <div className="aistro-shell">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-20 border-r border-[rgba(212,175,55,0.12)] bg-[rgba(4,2,10,0.86)] py-7 backdrop-blur-xl lg:flex lg:flex-col lg:items-center">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-20 border-r border-[rgba(154,100,21,0.18)] bg-[rgba(255,248,232,0.82)] py-7 backdrop-blur-xl lg:flex lg:flex-col lg:items-center">
         <button onClick={() => navigate("/")} className="aistro-display mb-9 text-sm text-[var(--gold-2)]">
           AI
         </button>
@@ -74,7 +74,7 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
           </button>
         ))}
         <div className="flex-1" />
-        <button onClick={handleLogout} className="mb-2 grid h-11 w-11 place-items-center rounded-[4px] text-xs font-bold text-[#ffc1ba]">
+        <button onClick={handleLogout} className="mb-2 grid h-11 w-11 place-items-center rounded-[4px] text-xs font-bold text-[#8f2f26]">
           X
         </button>
       </aside>
@@ -92,14 +92,14 @@ function Dashboard({ setIsAuthenticated = () => {} }) {
             <button onClick={() => navigate("/birth")} className="aistro-button-secondary px-4 py-2">
               Edit Birth
             </button>
-            <button onClick={handleLogout} className="aistro-button border border-[rgba(192,57,43,0.34)] bg-[rgba(192,57,43,0.12)] px-4 py-2 text-[#ffc1ba]">
+            <button onClick={handleLogout} className="aistro-button border border-[rgba(180,59,47,0.28)] bg-[rgba(180,59,47,0.08)] px-4 py-2 text-[#8f2f26]">
               Logout
             </button>
           </div>
         </header>
 
         {dashboardError && (
-          <div className="mb-5 rounded-[4px] border border-[rgba(192,57,43,0.4)] bg-[rgba(192,57,43,0.12)] px-4 py-3 text-sm text-[#ffc1ba]">
+          <div className="mb-5 rounded-[4px] border border-[rgba(180,59,47,0.32)] bg-[rgba(180,59,47,0.08)] px-4 py-3 text-sm text-[#8f2f26]">
             {dashboardError}
           </div>
         )}

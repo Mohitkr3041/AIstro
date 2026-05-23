@@ -55,7 +55,7 @@ function ReportPage() {
         </header>
 
         {notice && !reportError && (
-          <div className="rounded-[4px] border border-[rgba(39,174,96,0.35)] bg-[rgba(39,174,96,0.1)] px-4 py-3 text-sm font-bold text-[#b9f6cb]">
+          <div className="rounded-[4px] border border-[rgba(35,118,74,0.28)] bg-[rgba(35,118,74,0.08)] px-4 py-3 text-sm font-bold text-[#1f6b44]">
             {notice}
           </div>
         )}
@@ -66,7 +66,7 @@ function ReportPage() {
           </section>
         ) : reportError ? (
           <section className="aistro-card text-center">
-            <p className="mb-4 text-[#ffc1ba]">{reportError}</p>
+            <p className="mb-4 text-[#8f2f26]">{reportError}</p>
             <button onClick={() => generateReportData()} className="aistro-button-primary">
               Try Again
             </button>

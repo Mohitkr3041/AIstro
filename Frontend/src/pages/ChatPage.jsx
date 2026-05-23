@@ -52,7 +52,7 @@ function ChatPage() {
             <p className="aistro-muted italic">Opening the oracle...</p>
           </section>
         ) : error ? (
-          <section className="aistro-card text-[#ffc1ba]">{error}</section>
+          <section className="aistro-card text-[#8f2f26]">{error}</section>
         ) : (
           <ChatBox birthData={birthData} />
         )}

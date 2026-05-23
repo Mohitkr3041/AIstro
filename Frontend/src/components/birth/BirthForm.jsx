@@ -78,7 +78,7 @@ function BirthForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="rounded-[4px] border border-[rgba(192,57,43,0.4)] bg-[rgba(192,57,43,0.12)] px-4 py-3 text-sm text-[#ffc1ba]">
+        <div className="rounded-[4px] border border-[rgba(180,59,47,0.32)] bg-[rgba(180,59,47,0.08)] px-4 py-3 text-sm text-[#8f2f26]">
           {error}
         </div>
       )}

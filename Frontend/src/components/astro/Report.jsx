@@ -156,11 +156,11 @@ function ReadingCard({ children, className = "", ...props }) {
 
 function MiniCard({ eyebrow, title, body, action, tone = "default", children }) {
   const tones = {
-    default: "border-[rgba(212,175,55,0.16)] bg-black/25",
-    teal: "border-[rgba(39,174,96,0.26)] bg-[rgba(39,174,96,0.08)]",
-    amber: "border-[rgba(212,175,55,0.3)] bg-[rgba(212,175,55,0.08)]",
-    coral: "border-[rgba(192,57,43,0.28)] bg-[rgba(192,57,43,0.1)]",
-    indigo: "border-[rgba(155,89,182,0.3)] bg-[rgba(155,89,182,0.09)]",
+    default: "border-[rgba(154,100,21,0.18)] bg-[rgba(255,248,232,0.66)]",
+    teal: "border-[rgba(35,118,74,0.24)] bg-[rgba(35,118,74,0.07)]",
+    amber: "border-[rgba(154,100,21,0.26)] bg-[rgba(154,100,21,0.08)]",
+    coral: "border-[rgba(180,59,47,0.24)] bg-[rgba(180,59,47,0.08)]",
+    indigo: "border-[rgba(124,63,147,0.26)] bg-[rgba(124,63,147,0.07)]",
   };
 
   return (
@@ -170,7 +170,7 @@ function MiniCard({ eyebrow, title, body, action, tone = "default", children }) 
       {body && <p className="aistro-muted mt-3 text-sm leading-6">{body}</p>}
       {children}
       {action && (
-        <p className="mt-4 rounded-[4px] border border-[rgba(212,175,55,0.14)] bg-black/25 p-3 text-sm leading-6 text-[var(--parchment)]">
+        <p className="mt-4 rounded-[4px] border border-[rgba(154,100,21,0.16)] bg-[rgba(255,248,232,0.7)] p-3 text-sm leading-6 text-[var(--parchment)]">
           <span className="font-bold text-[var(--amethyst-2)]">Action: </span>
           {action}
         </p>
@@ -183,7 +183,7 @@ function BulletList({ items }) {
   return (
     <div className="grid gap-2">
       {clean(items).map((item, index) => (
-        <p key={index} className="rounded-[4px] border border-[rgba(212,175,55,0.14)] bg-black/25 p-3 text-sm leading-6 text-[var(--parchment)]">
+        <p key={index} className="rounded-[4px] border border-[rgba(154,100,21,0.16)] bg-[rgba(255,248,232,0.7)] p-3 text-sm leading-6 text-[var(--parchment)]">
           <span className="mr-2 inline-grid h-6 w-6 place-items-center rounded-[3px] bg-[rgba(155,89,182,0.35)] text-xs font-bold text-[var(--gold-2)]">
             {index + 1}
           </span>
@@ -311,7 +311,7 @@ function Report({ report }) {
               className={`rounded-[6px] border p-4 text-left transition ${
                 activePeriod === index
                   ? "border-[rgba(212,175,55,0.52)] bg-[rgba(155,89,182,0.28)] text-[var(--gold-2)]"
-                  : "border-[rgba(212,175,55,0.16)] bg-black/25 text-[var(--parchment)] hover:border-[rgba(212,175,55,0.38)]"
+                  : "border-[rgba(154,100,21,0.18)] bg-[rgba(255,248,232,0.66)] text-[var(--parchment)] hover:border-[rgba(154,100,21,0.4)]"
               }`}
             >
               <p className="text-xs font-black uppercase tracking-wide opacity-70">{item.period}</p>
@@ -364,8 +364,8 @@ function Report({ report }) {
         <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="grid gap-3">
             {clean(flow.remedy.daily_actions).map((action, index) => (
-              <div key={index} className="flex gap-3 rounded-[6px] border border-[rgba(212,175,55,0.16)] bg-black/25 p-4">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[4px] bg-[rgba(39,174,96,0.28)] font-bold text-[#b9f6cb]">
+              <div key={index} className="flex gap-3 rounded-[6px] border border-[rgba(154,100,21,0.18)] bg-[rgba(255,248,232,0.66)] p-4">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[4px] bg-[rgba(35,118,74,0.12)] font-bold text-[#1f6b44]">
                   {index + 1}
                 </span>
                 <p className="text-sm font-semibold leading-6 text-[var(--parchment)]">{action}</p>
