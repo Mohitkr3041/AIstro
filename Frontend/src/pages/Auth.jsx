@@ -1,19 +1,24 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { getBirthDetails } from "../services/birth.service";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { getBirthDetails, saveBirthDetails } from "../services/birth.service";
 import { loginUser, registerUser } from "../services/auth.service";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function Auth({ setIsAuthenticated = () => {} }) {
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(true);
+  const [searchParams] = useSearchParams();
+  const [isLogin, setIsLogin] = useState(searchParams.get("mode") !== "register");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState({ type: "", message: "" });
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
+    name: "",
+    dob: "",
+    tob: "",
+    place: "",
   });
 
   const handleChange = (e) => {
@@ -31,6 +36,11 @@ function Auth({ setIsAuthenticated = () => {} }) {
     if (!isLogin && username.length < 2) return "Username must be at least 2 characters long.";
     if (!emailRegex.test(email)) return "Enter a valid email address.";
     if (formData.password.length < 6) return "Password must be at least 6 characters long.";
+    if (!isLogin && formData.name.trim().length < 2) return "Enter your full name.";
+    if (!isLogin && !formData.dob) return "Choose your date of birth.";
+    if (!isLogin && new Date(formData.dob) > new Date()) return "Date of birth cannot be in the future.";
+    if (!isLogin && !formData.tob) return "Choose your time of birth.";
+    if (!isLogin && formData.place.trim().length < 2) return "Enter your place of birth.";
 
     return "";
   };
@@ -49,31 +59,39 @@ function Auth({ setIsAuthenticated = () => {} }) {
       setLoading(true);
       setStatus({ type: "", message: "" });
 
-      const res = isLogin
-        ? await loginUser({
-            email: formData.email.trim(),
-            password: formData.password,
-          })
-        : await registerUser({
-            username: formData.username.trim(),
-            email: formData.email.trim(),
-            password: formData.password,
-          });
-
-      if (!isLogin) {
-        setIsLogin(true);
-        setFormData({ username: "", email: "", password: "" });
-        setStatus({
-          type: "success",
-          message: res.data.message || "Account created. You can log in now.",
+      if (isLogin) {
+        await loginUser({
+          email: formData.email.trim(),
+          password: formData.password,
         });
+
+        setIsAuthenticated(true);
+
+        const birthRes = await getBirthDetails();
+        navigate(birthRes.data.data ? "/dashboard" : "/birth");
         return;
       }
 
-      setIsAuthenticated(true);
+      await registerUser({
+        username: formData.username.trim(),
+        email: formData.email.trim(),
+        password: formData.password,
+      });
 
-      const birthRes = await getBirthDetails();
-      navigate(birthRes.data.data ? "/dashboard" : "/birth");
+      await loginUser({
+        email: formData.email.trim(),
+        password: formData.password,
+      });
+
+      await saveBirthDetails({
+        name: formData.name.trim(),
+        dob: formData.dob,
+        tob: formData.tob,
+        place: formData.place.trim(),
+      });
+
+      setIsAuthenticated(true);
+      navigate("/dashboard");
     } catch (error) {
       setStatus({
         type: "error",
@@ -138,7 +156,7 @@ function Auth({ setIsAuthenticated = () => {} }) {
               </div>
               <h2 className="aistro-title text-3xl">{isLogin ? "Welcome Back" : "Create Account"}</h2>
               <p className="aistro-muted mt-2 italic">
-                {isLogin ? "The stars kept your workspace warm." : "Begin your personal reading archive."}
+                {isLogin ? "The stars kept your workspace warm." : "Create your account and cast your birth profile."}
               </p>
             </div>
 
@@ -177,15 +195,26 @@ function Auth({ setIsAuthenticated = () => {} }) {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {!isLogin && (
-                <input
-                  type="text"
-                  name="username"
-                  placeholder="Username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  autoComplete="username"
-                  className="aistro-input"
-                />
+                <>
+                  <input
+                    type="text"
+                    name="username"
+                    placeholder="Username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    autoComplete="username"
+                    className="aistro-input"
+                  />
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Full birth name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    autoComplete="name"
+                    className="aistro-input"
+                  />
+                </>
               )}
 
               <input
@@ -208,8 +237,38 @@ function Auth({ setIsAuthenticated = () => {} }) {
                 className="aistro-input"
               />
 
+              {!isLogin && (
+                <>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <input
+                      type="date"
+                      name="dob"
+                      value={formData.dob}
+                      onChange={handleChange}
+                      className="aistro-input"
+                    />
+                    <input
+                      type="time"
+                      name="tob"
+                      value={formData.tob}
+                      onChange={handleChange}
+                      className="aistro-input"
+                    />
+                  </div>
+                  <input
+                    type="text"
+                    name="place"
+                    placeholder="Birth city"
+                    value={formData.place}
+                    onChange={handleChange}
+                    autoComplete="address-level2"
+                    className="aistro-input"
+                  />
+                </>
+              )}
+
               <button type="submit" disabled={loading} className="aistro-button-primary w-full">
-                {loading ? "Please Wait" : isLogin ? "Enter Sanctum" : "Create Account"}
+                {loading ? "Please Wait" : isLogin ? "Enter Sanctum" : "Create Account & Cast Chart"}
               </button>
             </form>
 

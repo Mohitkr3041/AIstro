@@ -10,7 +10,7 @@ function ProtectedRoute({ isAuthenticated, children }) {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/auth" replace />;
   }
 
   return children;

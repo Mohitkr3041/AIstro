@@ -1,8 +1,11 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { startTransition, useEffect, useState } from "react";
+import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import BirthDetails from "./pages/BirthDetails";
 import Dashboard from "./pages/Dashboard";
+import ReportPage from "./pages/ReportPage";
+import ChatPage from "./pages/ChatPage";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import { getCurrentUser } from "./services/auth.service";
 
@@ -40,7 +43,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Auth setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/" element={<Landing />} />
+        <Route path="/auth" element={<Auth setIsAuthenticated={setIsAuthenticated} />} />
 
         <Route
           path="/birth"
@@ -56,6 +60,24 @@ function App() {
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
               <Dashboard setIsAuthenticated={setIsAuthenticated} />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/report"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ReportPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/chat"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ChatPage />
             </ProtectedRoute>
           }
         />
