@@ -156,22 +156,22 @@ function ReadingCard({ children, className = "", ...props }) {
 
 function MiniCard({ eyebrow, title, body, action, tone = "default", children }) {
   const tones = {
-    default: "border-[rgba(154,100,21,0.18)] bg-[rgba(255,248,232,0.66)]",
-    teal: "border-[rgba(35,118,74,0.24)] bg-[rgba(35,118,74,0.07)]",
-    amber: "border-[rgba(154,100,21,0.26)] bg-[rgba(154,100,21,0.08)]",
-    coral: "border-[rgba(180,59,47,0.24)] bg-[rgba(180,59,47,0.08)]",
-    indigo: "border-[rgba(124,63,147,0.26)] bg-[rgba(124,63,147,0.07)]",
+    default: "border-slate-200 bg-white/70",
+    teal: "border-emerald-100 bg-emerald-50/70",
+    amber: "border-amber-100 bg-amber-50/70",
+    coral: "border-red-100 bg-red-50/70",
+    indigo: "border-indigo-100 bg-indigo-50/70",
   };
 
   return (
-    <article className={`h-full rounded-[6px] border p-4 ${tones[tone] || tones.default}`}>
+    <article className={`h-full rounded-2xl border p-4 ${tones[tone] || tones.default}`}>
       {eyebrow && <p className="aistro-kicker text-[10px]">{eyebrow}</p>}
-      <h3 className="mt-2 text-xl font-semibold leading-tight text-[var(--gold-2)]">{title || "Not available"}</h3>
+      <h3 className="mt-2 text-xl font-black leading-tight tracking-[-0.03em] text-slate-950">{title || "Not available"}</h3>
       {body && <p className="aistro-muted mt-3 text-sm leading-6">{body}</p>}
       {children}
       {action && (
-        <p className="mt-4 rounded-[4px] border border-[rgba(154,100,21,0.16)] bg-[rgba(255,248,232,0.7)] p-3 text-sm leading-6 text-[var(--parchment)]">
-          <span className="font-bold text-[var(--amethyst-2)]">Action: </span>
+        <p className="mt-4 rounded-xl border border-slate-200 bg-white/75 p-3 text-sm leading-6 text-slate-700">
+          <span className="font-black text-[var(--primary)]">Action: </span>
           {action}
         </p>
       )}
@@ -183,8 +183,8 @@ function BulletList({ items }) {
   return (
     <div className="grid gap-2">
       {clean(items).map((item, index) => (
-        <p key={index} className="rounded-[4px] border border-[rgba(154,100,21,0.16)] bg-[rgba(255,248,232,0.7)] p-3 text-sm leading-6 text-[var(--parchment)]">
-          <span className="mr-2 inline-grid h-6 w-6 place-items-center rounded-[3px] bg-[rgba(155,89,182,0.35)] text-xs font-bold text-[var(--gold-2)]">
+        <p key={index} className="rounded-xl border border-slate-200 bg-white/75 p-3 text-sm leading-6 text-slate-700">
+          <span className="mr-2 inline-grid h-6 w-6 place-items-center rounded-lg bg-indigo-50 text-xs font-black text-[var(--primary)]">
             {index + 1}
           </span>
           {item}
@@ -225,7 +225,7 @@ function Report({ report }) {
                   key={item.id}
                   type="button"
                   onClick={() => scrollTo(item.id)}
-                  className="aistro-chip transition hover:border-[rgba(212,175,55,0.65)]"
+                  className="aistro-chip transition hover:border-indigo-200"
                 >
                   {item.label}
                 </button>
@@ -242,7 +242,7 @@ function Report({ report }) {
             ].map(([label, value]) => (
               <div key={label} className="aistro-panel">
                 <p className="aistro-kicker text-[10px]">{label}</p>
-                <p className="mt-2 font-semibold text-[var(--parchment)]">{value || "-"}</p>
+                <p className="mt-2 font-black text-slate-950">{value || "-"}</p>
               </div>
             ))}
           </div>
@@ -256,9 +256,9 @@ function Report({ report }) {
           subtitle="A short, direct reading of the person behind the chart."
         />
         <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className="rounded-[6px] border border-[rgba(212,175,55,0.28)] bg-[rgba(212,175,55,0.08)] p-5">
+          <div className="rounded-3xl border border-indigo-100 bg-indigo-50/70 p-5">
             <p className="aistro-kicker text-[10px]">Core Signature</p>
-            <p className="mt-3 text-2xl font-semibold leading-9 text-[var(--gold-2)]">
+            <p className="mt-3 text-2xl font-black leading-9 tracking-[-0.04em] text-slate-950">
               {flow.identity.core_signature || "Your chart suggests a layered personality with private intensity and visible responsibility."}
             </p>
             {flow.identity.user_hook && (
@@ -296,7 +296,7 @@ function Report({ report }) {
         </div>
       </ReadingCard>
 
-      <ReadingCard id="future" className="border-[rgba(212,175,55,0.4)]">
+      <ReadingCard id="future" className="border-indigo-100">
         <SectionTitle
           eyebrow="Future Prediction"
           title={flow.future.headline || "Your future timeline"}
@@ -308,10 +308,10 @@ function Report({ report }) {
               key={item.period}
               type="button"
               onClick={() => setActivePeriod(index)}
-              className={`rounded-[6px] border p-4 text-left transition ${
+              className={`rounded-2xl border p-4 text-left transition ${
                 activePeriod === index
-                  ? "border-[rgba(212,175,55,0.52)] bg-[rgba(155,89,182,0.28)] text-[var(--gold-2)]"
-                  : "border-[rgba(154,100,21,0.18)] bg-[rgba(255,248,232,0.66)] text-[var(--parchment)] hover:border-[rgba(154,100,21,0.4)]"
+                  ? "border-indigo-200 bg-indigo-600 text-white shadow-lg shadow-indigo-200"
+                  : "border-slate-200 bg-white/70 text-slate-950 hover:border-indigo-200"
               }`}
             >
               <p className="text-xs font-black uppercase tracking-wide opacity-70">{item.period}</p>
@@ -321,9 +321,9 @@ function Report({ report }) {
         </div>
 
         <div className="mt-5 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="rounded-[6px] border border-[rgba(212,175,55,0.32)] bg-[rgba(212,175,55,0.08)] p-5">
+          <div className="rounded-3xl border border-indigo-100 bg-indigo-50/70 p-5">
             <p className="aistro-kicker text-[10px]">{activeFuture.period}</p>
-            <h3 className="mt-3 text-2xl font-semibold leading-9 text-[var(--gold-2)]">
+            <h3 className="mt-3 text-2xl font-black leading-9 tracking-[-0.04em] text-slate-950">
               {activeFuture.prediction || "Generate a fresh report to unlock this timing."}
             </h3>
           </div>
@@ -364,11 +364,11 @@ function Report({ report }) {
         <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="grid gap-3">
             {clean(flow.remedy.daily_actions).map((action, index) => (
-              <div key={index} className="flex gap-3 rounded-[6px] border border-[rgba(154,100,21,0.18)] bg-[rgba(255,248,232,0.66)] p-4">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[4px] bg-[rgba(35,118,74,0.12)] font-bold text-[#1f6b44]">
+              <div key={index} className="flex gap-3 rounded-2xl border border-slate-200 bg-white/70 p-4">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-50 font-black text-emerald-700">
                   {index + 1}
                 </span>
-                <p className="text-sm font-semibold leading-6 text-[var(--parchment)]">{action}</p>
+                <p className="text-sm font-semibold leading-6 text-slate-700">{action}</p>
               </div>
             ))}
           </div>

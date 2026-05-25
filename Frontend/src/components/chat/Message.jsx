@@ -4,10 +4,10 @@ function Message({ text, sender = "ai" }) {
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
       <div
-        className={`max-w-[88%] break-words rounded-[6px] px-4 py-3 text-sm leading-6 shadow-sm sm:max-w-xl ${
+        className={`max-w-[88%] break-words rounded-2xl px-4 py-3 text-sm leading-6 shadow-sm sm:max-w-xl ${
           isUser
-            ? "border border-[rgba(212,175,55,0.28)] bg-[rgba(155,89,182,0.32)] text-[var(--parchment)]"
-            : "border border-[rgba(154,100,21,0.18)] bg-[rgba(255,252,245,0.8)] text-[var(--parchment)]"
+            ? "bg-indigo-600 text-white"
+            : "border border-slate-200 bg-white text-slate-700"
         }`}
       >
         {text}

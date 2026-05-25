@@ -131,7 +131,7 @@ function ChatBox({ birthData }) {
 
   return (
     <section className="aistro-card min-w-0">
-      <div className="border-b border-[rgba(212,175,55,0.14)] pb-5">
+      <div className="border-b border-slate-200 pb-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="aistro-kicker">AIstro Companion</p>
@@ -153,10 +153,10 @@ function ChatBox({ birthData }) {
               key={mode.id}
               type="button"
               onClick={() => setActiveMode(mode.id)}
-              className={`rounded-[6px] border p-3 text-left transition ${
+              className={`rounded-2xl border p-3 text-left transition ${
                 activeMode === mode.id
-                  ? "border-[rgba(212,175,55,0.52)] bg-[rgba(155,89,182,0.3)] text-[var(--gold-2)]"
-                  : "border-[rgba(154,100,21,0.18)] bg-[rgba(255,248,232,0.66)] text-[var(--parchment)] hover:border-[rgba(154,100,21,0.4)] hover:text-[var(--gold-2)]"
+                  ? "border-indigo-200 bg-indigo-600 text-white shadow-lg shadow-indigo-200"
+                  : "border-slate-200 bg-white/70 text-slate-950 hover:border-indigo-200 hover:text-[var(--primary)]"
               }`}
             >
               <span className="block text-sm font-bold">{mode.label}</span>
@@ -165,7 +165,7 @@ function ChatBox({ birthData }) {
           ))}
         </div>
 
-        <div className="mt-4 rounded-[6px] border border-[rgba(154,100,21,0.18)] bg-[rgba(255,248,232,0.66)] p-3">
+        <div className="mt-4 rounded-2xl border border-slate-200 bg-white/70 p-3">
           <p className="aistro-kicker mb-3 text-[10px]">
             Suggested questions for {activeModeConfig.label}
           </p>
@@ -176,7 +176,7 @@ function ChatBox({ birthData }) {
                 type="button"
                 onClick={() => handleSend(suggestion)}
                 disabled={loading || loadingHistory}
-                className="shrink-0 rounded-[4px] border border-[rgba(154,100,21,0.18)] bg-[rgba(255,252,245,0.76)] px-3 py-2 text-sm font-semibold text-[var(--muted)] transition hover:border-[rgba(154,100,21,0.44)] hover:text-[var(--gold-2)] disabled:opacity-50"
+                className="shrink-0 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 transition hover:border-indigo-200 hover:text-[var(--primary)] disabled:opacity-50"
               >
                 {suggestion}
               </button>
@@ -184,21 +184,21 @@ function ChatBox({ birthData }) {
           </div>
         </div>
 
-        <div className="mt-4 min-w-0 rounded-[6px] border border-[rgba(154,100,21,0.18)] bg-[rgba(255,248,232,0.66)] p-3 sm:p-4">
+        <div className="mt-4 min-w-0 rounded-3xl border border-slate-200 bg-white/70 p-3 sm:p-4">
           <div className="mb-4 max-h-[24rem] space-y-3 overflow-y-auto pr-1 sm:max-h-[28rem] sm:pr-2">
             {loadingHistory && (
               <p className="aistro-muted text-sm">Loading chat history...</p>
             )}
 
             {historyError && (
-              <div className="rounded-[4px] border border-[rgba(180,59,47,0.32)] bg-[rgba(180,59,47,0.08)] px-4 py-3 text-sm text-[#8f2f26]">
+              <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
                 {historyError}
               </div>
             )}
 
             {!loadingHistory && messages.length === 1 && (
-              <div className="rounded-[6px] border border-[rgba(35,118,74,0.24)] bg-[rgba(35,118,74,0.07)] p-4">
-                <p className="text-sm font-bold text-[#1f6b44]">Start with a focused question</p>
+              <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+                <p className="text-sm font-black text-emerald-700">Start with a focused question</p>
                 <p className="aistro-muted mt-1 text-sm leading-6">
                   Ask about future timing, past proof, career, or remedies.
                 </p>

@@ -21,7 +21,7 @@ function BirthDetails() {
             ].map(([label, value]) => (
               <div key={label} className="aistro-panel">
                 <p className="aistro-kicker text-[10px]">{label}</p>
-                <p className="mt-2 font-semibold text-[var(--parchment)]">{value}</p>
+                <p className="mt-2 font-semibold text-slate-950">{value}</p>
               </div>
             ))}
           </div>
