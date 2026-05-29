@@ -1,11 +1,14 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { startTransition, useEffect, useState } from "react";
 import Landing from "./pages/Landing";
-import Auth from "./pages/Auth";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import BirthDetails from "./pages/BirthDetails";
 import Dashboard from "./pages/Dashboard";
-import ReportPage from "./pages/ReportPage";
-import ChatPage from "./pages/ChatPage";
+import Report from "./pages/Report";
+import Chat from "./pages/Chat";
+import Settings from "./pages/Settings";
+import DashboardLayout from "./components/layout/DashboardLayout";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import { getCurrentUser } from "./services/auth.service";
 
@@ -17,22 +20,14 @@ function App() {
 
     getCurrentUser()
       .then(() => {
-        if (!isMounted) {
-          return;
+        if (isMounted) {
+          startTransition(() => setIsAuthenticated(true));
         }
-
-        startTransition(() => {
-          setIsAuthenticated(true);
-        });
       })
       .catch(() => {
-        if (!isMounted) {
-          return;
+        if (isMounted) {
+          startTransition(() => setIsAuthenticated(false));
         }
-
-        startTransition(() => {
-          setIsAuthenticated(false);
-        });
       });
 
     return () => {
@@ -44,43 +39,27 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
-        <Route path="/auth" element={<Auth setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/signup" element={<Signup setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/auth" element={<Navigate to="/login" replace />} />
 
         <Route
-          path="/birth"
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <BirthDetails />
+              <DashboardLayout setIsAuthenticated={setIsAuthenticated} />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/birth" element={<BirthDetails />} />
+          <Route path="/report" element={<Report />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
 
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <Dashboard setIsAuthenticated={setIsAuthenticated} />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/report"
-          element={
-            <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <ReportPage />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/chat"
-          element={
-            <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <ChatPage />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/app" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/app/report" element={<Navigate to="/report" replace />} />
+        <Route path="/app/chat" element={<Navigate to="/chat" replace />} />
       </Routes>
     </BrowserRouter>
   );
