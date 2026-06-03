@@ -143,4 +143,44 @@ const me = async (req, res) => {
   }
 };
 
-module.exports = { register, login, logout, me };
+const updateMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const username = typeof req.body.username === "string" ? req.body.username.trim() : user.username;
+    const email = typeof req.body.email === "string" ? req.body.email.trim().toLowerCase() : user.email;
+
+    if (username.length < 2) {
+      return res.status(400).json({ message: "Username must be at least 2 characters long" });
+    }
+
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Please enter a valid email address" });
+    }
+
+    if (email !== user.email) {
+      const existingUser = await User.findOne({ email, _id: { $ne: user._id } });
+
+      if (existingUser) {
+        return res.status(400).json({ message: "Email is already in use" });
+      }
+    }
+
+    user.username = username;
+    user.email = email;
+    await user.save();
+
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: getSafeUser(user),
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to update profile" });
+  }
+};
+
+module.exports = { register, login, logout, me, updateMe };

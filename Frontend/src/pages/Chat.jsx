@@ -1,10 +1,12 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Send, Sparkles, Moon, Heart, Briefcase, TrendingUp, Star, Bot } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { motion, AnimatePresence } from 'motion/react';
 import { askAstroChat, getChatHistory } from '../services/chat.service';
+import { useLocation } from 'react-router-dom';
 
 function ChatPage() {
+  const location = useLocation();
   const [messages, setMessages] = useState([
     {
       id: '1',
@@ -16,6 +18,7 @@ function ChatPage() {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [chatError, setChatError] = useState('');
+  const [queuedPrompt, setQueuedPrompt] = useState(location.state?.prompt || '');
   const messagesEndRef = useRef(null);
   
   const suggestionChips = [
@@ -24,6 +27,38 @@ function ChatPage() {
     { icon: Moon, text: "Interpret my moon sign", color: 'from-purple-500 to-indigo-500' },
     { icon: TrendingUp, text: "Current transits affecting me", color: 'from-green-500 to-emerald-500' },
   ];
+
+  const handleSend = useCallback(async (messageText) => {
+    const text = messageText || inputValue.trim();
+    if (!text) return;
+
+    const userMessage = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: text,
+      timestamp: new Date(),
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputValue('');
+    setIsTyping(true);
+
+    try {
+      const res = await askAstroChat(text);
+      const aiMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: res.data.reply,
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, aiMessage]);
+      setChatError('');
+    } catch (error) {
+      setChatError(error.response?.data?.message || 'The AI guide could not answer right now.');
+    } finally {
+      setIsTyping(false);
+    }
+  }, [inputValue]);
   
   useEffect(() => {
     const loadHistory = async () => {
@@ -52,38 +87,13 @@ function ChatPage() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-  
-  const handleSend = async (messageText) => {
-    const text = messageText || inputValue.trim();
-    if (!text) return;
-    
-    const userMessage = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: text,
-      timestamp: new Date(),
-    };
-    
-    setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
-    setIsTyping(true);
 
-    try {
-      const res = await askAstroChat(text);
-      const aiMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: res.data.reply,
-        timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, aiMessage]);
-      setChatError('');
-    } catch (error) {
-      setChatError(error.response?.data?.message || 'The AI guide could not answer right now.');
-    } finally {
-      setIsTyping(false);
-    }
-  };
+  useEffect(() => {
+    if (!queuedPrompt || isTyping) return;
+
+    setQueuedPrompt('');
+    handleSend(queuedPrompt);
+  }, [queuedPrompt, isTyping, handleSend]);
   
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {

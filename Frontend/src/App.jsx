@@ -5,7 +5,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import BirthDetails from "./pages/BirthDetails";
 import Dashboard from "./pages/Dashboard";
-import Report from "./pages/Report";
+import Report from "./pages/ReportPage";
 import Chat from "./pages/Chat";
 import Settings from "./pages/Settings";
 import DashboardLayout from "./components/layout/DashboardLayout";
