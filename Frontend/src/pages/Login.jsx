@@ -11,16 +11,22 @@ function LoginPage({ setIsAuthenticated = () => {} }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
+    setNotice('');
 
     try {
       await loginUser({ email, password });
       setIsAuthenticated(true);
       navigate('/dashboard');
+    } catch (loginError) {
+      setError(loginError.response?.data?.message || 'Could not sign in. Please check your email and password.');
     } finally {
       setIsLoading(false);
     }
@@ -85,6 +91,9 @@ function LoginPage({ setIsAuthenticated = () => {} }) {
             
             <h2 className="text-3xl font-display font-bold text-foreground mb-2">Sign In</h2>
             <p className="text-foreground/70 mb-8">Continue your cosmic exploration</p>
+
+            {error && <div className="aistro-status-error mb-6">{error}</div>}
+            {notice && <div className="aistro-status-success mb-6">{notice}</div>}
             
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Email Input */}
@@ -161,6 +170,7 @@ function LoginPage({ setIsAuthenticated = () => {} }) {
               {/* Google Sign In */}
               <button
                 type="button"
+                onClick={() => setNotice('Google sign-in is not configured for this backend yet. Please use email and password.')}
                 className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-white border-2 border-purple-200 rounded-2xl hover:bg-purple-50/50 hover:border-primary/30 transition-all"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">

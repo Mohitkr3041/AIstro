@@ -11,6 +11,8 @@ function SignupPage({ setIsAuthenticated = () => {} }) {
   const [showPassword, setShowPassword] = useState(false);
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
@@ -23,7 +25,17 @@ function SignupPage({ setIsAuthenticated = () => {} }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setNotice('');
     if (step === 1) {
+      if (formData.name.trim().length < 2) {
+        setError('Enter your full name.');
+        return;
+      }
+      if (formData.password.length < 6) {
+        setError('Password must be at least 6 characters long.');
+        return;
+      }
       setStep(2);
     } else {
       setIsLoading(true);
@@ -43,6 +55,8 @@ function SignupPage({ setIsAuthenticated = () => {} }) {
         });
         setIsAuthenticated(true);
         navigate('/dashboard');
+      } catch (signupError) {
+        setError(signupError.response?.data?.message || 'Could not create your account.');
       } finally {
         setIsLoading(false);
       }
@@ -137,6 +151,9 @@ function SignupPage({ setIsAuthenticated = () => {} }) {
             <p className="text-foreground/70 mb-8">
               {step === 1 ? 'Join thousands exploring their cosmic blueprint' : 'Tell us about your cosmic origins'}
             </p>
+
+            {error && <div className="aistro-status-error mb-6">{error}</div>}
+            {notice && <div className="aistro-status-success mb-6">{notice}</div>}
             
             <form onSubmit={handleSubmit} className="space-y-6">
               {step === 1 ? (
@@ -315,6 +332,7 @@ function SignupPage({ setIsAuthenticated = () => {} }) {
                   {/* Google Sign Up */}
                   <button
                     type="button"
+                    onClick={() => setNotice('Google sign-up is not configured for this backend yet. Please use email and password.')}
                     className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-white border-2 border-purple-200 rounded-2xl hover:bg-purple-50/50 hover:border-primary/30 transition-all"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">

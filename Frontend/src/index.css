@@ -27,6 +27,9 @@
     --sidebar-primary-foreground: #ffffff;
     --sidebar-accent: #2d2850;
     --sidebar-border: rgba(109, 74, 255, 0.2);
+    --success: #1f9d68;
+    --warning: #d97706;
+    --danger: #dc2626;
   }
 
   html,
@@ -44,8 +47,17 @@
 
   button,
   input,
+  select,
   textarea {
     font: inherit;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible {
+    outline: 3px solid rgba(109, 74, 255, 0.35);
+    outline-offset: 3px;
   }
 
   ::selection {
@@ -91,8 +103,25 @@
     @apply rounded-2xl border border-purple-100 bg-white/70 p-4;
   }
 
+  .aistro-chip {
+    @apply inline-flex items-center justify-center rounded-full border border-purple-100 bg-white/75 px-4 py-2 text-sm font-semibold shadow-sm backdrop-blur-sm;
+    color: rgba(30, 27, 75, 0.75);
+  }
+
   .aistro-input {
     @apply w-full rounded-2xl border-2 border-transparent bg-input-background px-4 py-3 outline-none transition-all focus:border-primary;
+  }
+
+  .aistro-status-success {
+    @apply rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700;
+  }
+
+  .aistro-status-error {
+    @apply rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700;
+  }
+
+  .aistro-skeleton {
+    @apply animate-pulse rounded-2xl bg-purple-100/70;
   }
 
   .aistro-button-primary {
