@@ -1,385 +1,348 @@
-import { useMemo, useState } from "react";
-
-const clean = (items = []) => items.filter(Boolean);
-
-const navItems = [
-  { id: "about", label: "About You" },
-  { id: "past", label: "Past" },
-  { id: "future", label: "Future" },
-  { id: "life", label: "Life Areas" },
-  { id: "remedies", label: "Remedies" },
-];
-
-const buildFlow = (report) => {
-  const flow = report.reading_flow || {};
-  const summary = report.chart_summary || {};
-  const quick = report.quick_summary || {};
-  const personality = report.personality_and_mindset || {};
-  const career = report.career_and_education || {};
-  const love = report.love_and_relationships || {};
-  const money = report.money_and_wealth || {};
-  const health = report.health_and_lifestyle || {};
-  const forecast = report.forecast || {};
-  const current = report.current_transits || {};
-  const remedies = report.remedies || {};
-  const lucky = report.lucky_factors || {};
-
-  return {
-    identity: flow.astrological_identity || {
-      title: "Your astrological identity",
-      core_signature: quick.personality || personality.nature,
-      chart_factors: clean([
-        summary.sun_sign && `Sun in ${summary.sun_sign}`,
-        summary.moon_sign && `Moon in ${summary.moon_sign}`,
-        summary.moon_nakshatra && `Moon nakshatra: ${summary.moon_nakshatra}`,
-      ]),
-      what_this_means: clean([
-        personality.emotional_pattern,
-        personality.communication_style,
-        personality.stress_handling,
-      ]),
-      user_hook: quick.strength,
-    },
-    past: flow.past_happenings || {
-      title: "Past patterns your chart may validate",
-      validation_points: [
-        {
-          area: "Personality",
-          likely_event: personality.emotional_pattern,
-          chart_reason: personality.stress_handling,
-          reflection_prompt: "Did this pattern repeat when pressure increased?",
-        },
-        {
-          area: "Education/Career",
-          likely_event: career.growth_periods,
-          chart_reason: career.job_or_business,
-          reflection_prompt: "Did direction become clearer after confusion or delay?",
-        },
-        {
-          area: "Love/Family",
-          likely_event: love.relationship_pattern,
-          chart_reason: love.partner_type,
-          reflection_prompt: "Did you notice this emotional pattern before trusting someone?",
-        },
-      ],
-    },
-    future: flow.future_prediction || {
-      headline: quick.next_30_days_highlight || "Your next phase rewards clarity and consistent action.",
-      timeline: [
-        {
-          period: "Next 30 days",
-          prediction: forecast.next_30_days || quick.next_30_days_highlight,
-          opportunity: current.focus_now || quick.career_direction,
-          watch_out: current.avoid_now || money.spending_pattern,
-          best_action: current.focus_now || "Choose one priority and act consistently.",
-        },
-        {
-          period: "Next 6 months",
-          prediction: forecast.next_6_months,
-          opportunity: career.growth_periods || money.wealth_growth_timeline,
-          watch_out: love.red_flags,
-          best_action: clean(report.final_guidance)[0],
-        },
-        {
-          period: "Next 1 year",
-          prediction: money.wealth_growth_timeline || career.growth_periods,
-          opportunity: "Longer-term growth improves when your actions become steady and less reactive.",
-          watch_out: clean(report.strengths_and_weaknesses?.weaknesses)[0],
-          best_action: clean(report.final_guidance)[1] || clean(report.final_guidance)[0],
-        },
-      ],
-    },
-    departments: flow.departments?.length ? flow.departments : [
-      {
-        name: "Career",
-        insight: career.job_or_business,
-        action: career.skill_recommendations?.join(", "),
-      },
-      {
-        name: "Education",
-        insight: career.best_fields?.join(", "),
-        action: "Choose one learning direction and build depth before switching.",
-      },
-      {
-        name: "Love",
-        insight: love.relationship_pattern || love.partner_type,
-        action: love.red_flags,
-      },
-      {
-        name: "Money",
-        insight: money.earning_style,
-        action: money.wealth_growth_timeline,
-      },
-      {
-        name: "Family",
-        insight: "Your chart may show emotional responsibility inside close relationships.",
-        action: "Speak clearly before resentment builds.",
-      },
-      {
-        name: "Health",
-        insight: health.weak_areas?.join(", "),
-        action: clean(health.lifestyle_advice)[0],
-      },
-    ],
-    remedy: flow.remedy_plan || {
-      priority: remedies.mindset_remedy || "Stability before speed",
-      daily_actions: clean(remedies.daily_habits),
-      mantra_or_focus: remedies.mantra,
-      avoid_this: current.avoid_now,
-      lucky_support: clean([
-        lucky.lucky_day && `Day: ${lucky.lucky_day}`,
-        lucky.lucky_color && `Color: ${lucky.lucky_color}`,
-        lucky.lucky_number && `Number: ${lucky.lucky_number}`,
-        lucky.lucky_direction && `Direction: ${lucky.lucky_direction}`,
-      ]).join(" | "),
-    },
-  };
-};
-
-function SectionTitle({ eyebrow, title, subtitle }) {
-  return (
-    <div className="mb-5">
-      <p className="aistro-kicker">{eyebrow}</p>
-      <h2 className="aistro-title mt-2 text-3xl sm:text-4xl">{title}</h2>
-      {subtitle && <p className="aistro-muted mt-2 max-w-3xl text-sm italic leading-6">{subtitle}</p>}
-    </div>
-  );
-}
-
-function ReadingCard({ children, className = "", ...props }) {
-  return (
-    <section className={`aistro-card scroll-mt-24 ${className}`} {...props}>
-      {children}
-    </section>
-  );
-}
-
-function MiniCard({ eyebrow, title, body, action, tone = "default", children }) {
-  const tones = {
-    default: "border-slate-200 bg-white/70",
-    teal: "border-emerald-100 bg-emerald-50/70",
-    amber: "border-amber-100 bg-amber-50/70",
-    coral: "border-red-100 bg-red-50/70",
-    indigo: "border-indigo-100 bg-indigo-50/70",
-  };
-
-  return (
-    <article className={`h-full rounded-2xl border p-4 ${tones[tone] || tones.default}`}>
-      {eyebrow && <p className="aistro-kicker text-[10px]">{eyebrow}</p>}
-      <h3 className="mt-2 text-xl font-black leading-tight tracking-[-0.03em] text-slate-950">{title || "Not available"}</h3>
-      {body && <p className="aistro-muted mt-3 text-sm leading-6">{body}</p>}
-      {children}
-      {action && (
-        <p className="mt-4 rounded-xl border border-slate-200 bg-white/75 p-3 text-sm leading-6 text-slate-700">
-          <span className="font-black text-[var(--primary)]">Action: </span>
-          {action}
-        </p>
-      )}
-    </article>
-  );
-}
-
-function BulletList({ items }) {
-  return (
-    <div className="grid gap-2">
-      {clean(items).map((item, index) => (
-        <p key={index} className="rounded-xl border border-slate-200 bg-white/75 p-3 text-sm leading-6 text-slate-700">
-          <span className="mr-2 inline-grid h-6 w-6 place-items-center rounded-lg bg-indigo-50 text-xs font-black text-[var(--primary)]">
-            {index + 1}
-          </span>
-          {item}
-        </p>
-      ))}
-    </div>
-  );
-}
+import { Sun as SunIcon, Moon, TrendingUp, Heart, Briefcase, Star, Sparkles, ChevronDown, Calendar, MapPin } from 'lucide-react';
+import { motion } from 'motion/react';
+import { useState } from 'react';
 
 function Report({ report }) {
-  const [activePeriod, setActivePeriod] = useState(0);
-  const flow = useMemo(() => buildFlow(report || {}), [report]);
-
-  if (!report) return null;
-
-  const summary = report.chart_summary || {};
-  const activeFuture = flow.future.timeline?.[activePeriod] || flow.future.timeline?.[0] || {};
-
-  const scrollTo = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
+  const [expandedSection, setExpandedSection] = useState('sun');
+  
+  // Use dynamic data if available, otherwise fallback to static placeholder
+  const summary = report?.chart_summary || {};
+  
+  const planets = [
+    { name: 'Sun', sign: summary.sun_sign || 'Gemini', house: '10th House', degree: '15°', icon: SunIcon, color: 'from-yellow-400 to-orange-500' },
+    { name: 'Moon', sign: summary.moon_sign || 'Pisces', house: '7th House', degree: '22°', icon: Moon, color: 'from-blue-400 to-purple-500' },
+    { name: 'Mercury', sign: 'Gemini', house: '10th House', degree: '18°', icon: Sparkles, color: 'from-green-400 to-teal-500' },
+    { name: 'Venus', sign: 'Taurus', house: '9th House', degree: '8°', icon: Heart, color: 'from-pink-400 to-rose-500' },
+    { name: 'Mars', sign: 'Leo', house: '12th House', degree: '25°', icon: TrendingUp, color: 'from-red-400 to-orange-500' },
+  ];
+  
+  const strengths = [
+    'Natural communicator with gift for words',
+    'Highly adaptable and quick learner',
+    'Creative problem solver',
+    'Empathetic and intuitive',
+    'Strong leadership potential',
+  ];
+  
+  const challenges = [
+    'Tendency to overthink decisions',
+    'Can be emotionally sensitive',
+    'Sometimes scattered focus',
+    'Difficulty saying no to others',
+  ];
+  
   return (
-    <section className="space-y-5">
-      <div className="aistro-card">
-        <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
-          <div>
-            <p className="aistro-kicker">Personal Astrology Reading</p>
-            <h1 className="aistro-title mt-3 max-w-3xl text-5xl">
-              Your chart decoded in a simple order.
+    <div className="w-full">
+      {/* Hero Header */}
+      <div className="relative bg-gradient-to-br from-primary via-accent to-primary py-16 px-4 md:px-8 rounded-3xl overflow-hidden mb-12 shadow-lg">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0ic3RhcnMiIHg9IjAiIHk9IjAiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjMiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjc3RhcnMpIi8+PC9zdmc+')] opacity-30" />
+        
+        <div className="relative max-w-5xl mx-auto text-center text-white">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <h1 className="text-4xl md:text-6xl font-display font-bold mb-4">
+              Your Cosmic Blueprint
             </h1>
-            <p className="aistro-muted mt-4 max-w-2xl text-base italic leading-7">
-              First about you, then past validation, then future prediction, life areas, and remedies.
+            <p className="text-xl md:text-2xl text-white/90 mb-6">
+              A Complete Astrology Report
             </p>
-            <div className="mt-6 flex flex-wrap gap-2">
-              {navItems.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => scrollTo(item.id)}
-                  className="aistro-chip transition hover:border-indigo-200"
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:mt-0">
-            {[
-              ["Sun", summary.sun_sign],
-              ["Moon", summary.moon_sign],
-              ["Nakshatra", summary.moon_nakshatra],
-              ["System", summary.zodiac_system],
-            ].map(([label, value]) => (
-              <div key={label} className="aistro-panel">
-                <p className="aistro-kicker text-[10px]">{label}</p>
-                <p className="mt-2 font-black text-slate-950">{value || "-"}</p>
+            
+            <div className="flex flex-wrap items-center justify-center gap-6 text-white/80">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-5 h-5" />
+                <span>Generated Today</span>
               </div>
-            ))}
-          </div>
+            </div>
+          </motion.div>
         </div>
       </div>
-
-      <ReadingCard id="about">
-        <SectionTitle
-          eyebrow="About You"
-          title={flow.identity.title || "Your astrological identity"}
-          subtitle="A short, direct reading of the person behind the chart."
-        />
-        <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className="rounded-3xl border border-indigo-100 bg-indigo-50/70 p-5">
-            <p className="aistro-kicker text-[10px]">Core Signature</p>
-            <p className="mt-3 text-2xl font-black leading-9 tracking-[-0.04em] text-slate-950">
-              {flow.identity.core_signature || "Your chart suggests a layered personality with private intensity and visible responsibility."}
-            </p>
-            {flow.identity.user_hook && (
-              <p className="aistro-muted mt-4 text-sm leading-7">{flow.identity.user_hook}</p>
-            )}
+      
+      <div className="w-full">
+        {/* Natal Chart Summary */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-12"
+        >
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl border border-purple-100 p-8 shadow-lg">
+            <h2 className="text-3xl font-display font-bold text-foreground mb-6">Natal Chart Overview</h2>
+            
+            <div className="grid md:grid-cols-3 gap-8 mb-8">
+              <div className="text-center">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center mx-auto mb-3 shadow-lg">
+                  <SunIcon className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="font-display font-semibold text-foreground mb-1">Sun Sign</h3>
+                <p className="text-2xl font-display text-primary">{summary.sun_sign || 'Gemini'}</p>
+                <p className="text-sm text-foreground/60">Your Core Identity</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center mx-auto mb-3 shadow-lg">
+                  <Moon className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="font-display font-semibold text-foreground mb-1">Moon Sign</h3>
+                <p className="text-2xl font-display text-primary">{summary.moon_sign || 'Pisces'}</p>
+                <p className="text-sm text-foreground/60">Your Emotional Nature</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center mx-auto mb-3 shadow-lg">
+                  <TrendingUp className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="font-display font-semibold text-foreground mb-1">Rising Sign</h3>
+                <p className="text-2xl font-display text-primary">Leo</p>
+                <p className="text-sm text-foreground/60">Your Outer Persona</p>
+              </div>
+            </div>
+            
+            <div className="bg-gradient-to-r from-purple-50 to-violet-50 rounded-2xl p-6 border-l-4 border-primary">
+              <p className="text-foreground/80 leading-relaxed">
+                <span className="font-semibold text-foreground">Your essence:</span> You are a naturally curious and communicative soul ({summary.sun_sign || 'Gemini'} Sun) 
+                with deep emotional wisdom and intuition ({summary.moon_sign || 'Pisces'} Moon), presenting yourself to the world with confidence and warmth (Leo Rising). 
+                This unique combination makes you both intellectually brilliant and emotionally profound.
+              </p>
+            </div>
           </div>
-          <div className="grid gap-4">
-            <MiniCard eyebrow="Chart factors" title="Why this is personal" tone="teal">
-              <BulletList items={flow.identity.chart_factors} />
-            </MiniCard>
-            <MiniCard eyebrow="Meaning" title="How this shows up" tone="indigo">
-              <BulletList items={flow.identity.what_this_means} />
-            </MiniCard>
-          </div>
-        </div>
-      </ReadingCard>
-
-      <ReadingCard id="past">
-        <SectionTitle
-          eyebrow="Past Validation"
-          title={flow.past.title || "What your chart may remember"}
-          subtitle="These cards help the user feel that the reading understands what has already happened."
-        />
-        <div className="grid gap-4 lg:grid-cols-3">
-          {(flow.past.validation_points || []).map((point, index) => (
-            <MiniCard
-              key={`${point.area}-${index}`}
-              eyebrow={point.area}
-              title={point.likely_event}
-              body={point.chart_reason}
-              action={point.reflection_prompt}
-              tone={["teal", "amber", "coral"][index] || "default"}
-            />
-          ))}
-        </div>
-      </ReadingCard>
-
-      <ReadingCard id="future" className="border-indigo-100">
-        <SectionTitle
-          eyebrow="Future Prediction"
-          title={flow.future.headline || "Your future timeline"}
-          subtitle="This is the main value section: prediction, opportunity, warning, and action."
-        />
-        <div className="grid gap-3 md:grid-cols-3">
-          {(flow.future.timeline || []).map((item, index) => (
-            <button
-              key={item.period}
-              type="button"
-              onClick={() => setActivePeriod(index)}
-              className={`rounded-2xl border p-4 text-left transition ${
-                activePeriod === index
-                  ? "border-indigo-200 bg-indigo-600 text-white shadow-lg shadow-indigo-200"
-                  : "border-slate-200 bg-white/70 text-slate-950 hover:border-indigo-200"
-              }`}
-            >
-              <p className="text-xs font-black uppercase tracking-wide opacity-70">{item.period}</p>
-              <p className="mt-2 text-lg font-black leading-tight">{item.opportunity || item.prediction || "Prediction"}</p>
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-5 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="rounded-3xl border border-indigo-100 bg-indigo-50/70 p-5">
-            <p className="aistro-kicker text-[10px]">{activeFuture.period}</p>
-            <h3 className="mt-3 text-2xl font-black leading-9 tracking-[-0.04em] text-slate-950">
-              {activeFuture.prediction || "Generate a fresh report to unlock this timing."}
-            </h3>
-          </div>
-          <div className="grid gap-3">
-            <MiniCard eyebrow="Opportunity" title={activeFuture.opportunity} tone="teal" />
-            <MiniCard eyebrow="Watch out" title={activeFuture.watch_out} tone="coral" />
-            <MiniCard eyebrow="Best action" title={activeFuture.best_action} tone="indigo" />
-          </div>
-        </div>
-      </ReadingCard>
-
-      <ReadingCard id="life">
-        <SectionTitle
-          eyebrow="Life Areas"
-          title="Guidance by department"
-          subtitle="Concise but useful guidance for the main areas users care about."
-        />
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {(flow.departments || []).map((department, index) => (
-            <MiniCard
-              key={`${department.name}-${index}`}
-              eyebrow="Life area"
-              title={department.name}
-              body={department.insight || department.future_signal}
-              action={department.action}
-              tone={["teal", "amber", "coral", "indigo"][index % 4]}
-            />
-          ))}
-        </div>
-      </ReadingCard>
-
-      <ReadingCard id="remedies">
-        <SectionTitle
-          eyebrow="Remedies"
-          title={flow.remedy.priority || "Your personal action plan"}
-          subtitle="Simple daily actions and lucky support to make the reading useful."
-        />
-        <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="grid gap-3">
-            {clean(flow.remedy.daily_actions).map((action, index) => (
-              <div key={index} className="flex gap-3 rounded-2xl border border-slate-200 bg-white/70 p-4">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-50 font-black text-emerald-700">
-                  {index + 1}
-                </span>
-                <p className="text-sm font-semibold leading-6 text-slate-700">{action}</p>
+        </motion.div>
+        
+        {/* Planet Placements */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-12"
+        >
+          <h2 className="text-3xl font-display font-bold text-foreground mb-6">Planetary Placements</h2>
+          
+          <div className="space-y-4">
+            {planets.map((planet) => (
+              <div key={planet.name} className="bg-white/80 backdrop-blur-sm rounded-2xl border border-purple-100 overflow-hidden shadow-lg">
+                <div className="flex items-center gap-4 p-6">
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${planet.color} flex items-center justify-center flex-shrink-0 shadow-lg`}>
+                    <planet.icon className="w-7 h-7 text-white" />
+                  </div>
+                  
+                  <div className="flex-1">
+                    <h3 className="font-display font-semibold text-lg text-foreground">{planet.name}</h3>
+                    <p className="text-foreground/70">
+                      {planet.sign} • {planet.house} • {planet.degree}
+                    </p>
+                  </div>
+                  
+                  <button
+                    onClick={() => setExpandedSection(expandedSection === planet.name.toLowerCase() ? null : planet.name.toLowerCase())}
+                    className="w-10 h-10 rounded-xl bg-purple-50 hover:bg-purple-100 flex items-center justify-center transition-colors"
+                    aria-label={expandedSection === planet.name.toLowerCase() ? `Collapse ${planet.name} details` : `Expand ${planet.name} details`}
+                    aria-expanded={expandedSection === planet.name.toLowerCase()}
+                  >
+                    <ChevronDown className={`w-5 h-5 text-primary transition-transform ${
+                      expandedSection === planet.name.toLowerCase() ? 'rotate-180' : ''
+                    }`} />
+                  </button>
+                </div>
+                
+                {expandedSection === planet.name.toLowerCase() && (
+                  <div className="px-6 pb-6 pt-0">
+                    <div className="bg-purple-50 rounded-2xl p-4">
+                      <p className="text-foreground/80 leading-relaxed">
+                        {planet.name === 'Sun' && `Your ${planet.sign} Sun makes you naturally curious, adaptable, and intellectually driven. You thrive on communication and learning, constantly seeking new information and experiences. Your mind is quick and versatile, making you excellent at multitasking and seeing multiple perspectives.`}
+                        {planet.name === 'Moon' && `With your Moon in ${planet.sign}, you possess deep emotional sensitivity and powerful intuition. You're naturally empathetic and can easily tune into others' feelings. Your imagination is vivid, and you may find solace in creative or spiritual pursuits.`}
+                        {planet.name === 'Mercury' && `Mercury in ${planet.sign} gives you exceptional communication skills and mental agility. You're a natural wordsmith who can articulate ideas clearly and persuasively. Your mind works quickly, and you excel at connecting different concepts and ideas.`}
+                        {planet.name === 'Venus' && `Venus in ${planet.sign} brings a deep appreciation for beauty, comfort, and stability in relationships. You value loyalty and prefer quality over quantity in love. Material security and sensory pleasures are important to you.`}
+                        {planet.name === 'Mars' && `Mars in ${planet.sign} gives you bold, creative energy and natural leadership abilities. You pursue your goals with confidence and passion. You're motivated by recognition and enjoy being in the spotlight for your achievements.`}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
-          <div className="grid gap-4">
-            <MiniCard eyebrow="Focus" title={flow.remedy.mantra_or_focus} tone="amber" />
-            <MiniCard eyebrow="Avoid" title={flow.remedy.avoid_this} tone="coral" />
-            <MiniCard eyebrow="Lucky support" title={flow.remedy.lucky_support} tone="teal" />
+        </motion.div>
+        
+        {/* Love & Relationships */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-12"
+        >
+          <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-3xl border border-pink-200 p-8 shadow-lg">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center shadow-lg">
+                <Heart className="w-7 h-7 text-white" />
+              </div>
+              <h2 className="text-3xl font-display font-bold text-foreground">Love & Relationships</h2>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-display font-semibold text-foreground mb-2">Romantic Nature</h3>
+                <p className="text-foreground/80 leading-relaxed">
+                  In love, you seek deep emotional and intellectual connection. Your {summary.sun_sign || 'Gemini'} Sun craves stimulating conversation 
+                  and variety, while your {summary.moon_sign || 'Pisces'} Moon desires profound emotional intimacy and spiritual bonding. You're romantic, 
+                  imaginative, and value partners who can engage both your mind and heart.
+                </p>
+              </div>
+              
+              <div className="bg-white/60 rounded-2xl p-6">
+                <h3 className="font-display font-semibold text-foreground mb-3">Best Matches</h3>
+                <div className="grid md:grid-cols-3 gap-4">
+                  {['Libra', 'Aquarius', 'Cancer'].map((sign) => (
+                    <div key={sign} className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-pink-200">
+                      <Star className="w-5 h-5 text-pink-500 fill-pink-500" />
+                      <span className="font-medium text-foreground">{sign}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="font-display font-semibold text-foreground mb-2">Relationship Advice</h3>
+                <p className="text-foreground/80 leading-relaxed">
+                  Balance your need for independence with emotional intimacy. Communicate your feelings clearly, even when they're 
+                  complex. Your ideal partner appreciates your depth, values honest dialogue, and gives you space to explore your interests.
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
-      </ReadingCard>
-    </section>
+        </motion.div>
+        
+        {/* Career & Life Path */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-12"
+        >
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-3xl border border-blue-200 p-8 shadow-lg">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg">
+                <Briefcase className="w-7 h-7 text-white" />
+              </div>
+              <h2 className="text-3xl font-display font-bold text-foreground">Career & Purpose</h2>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-display font-semibold text-foreground mb-2">Professional Strengths</h3>
+                <p className="text-foreground/80 leading-relaxed mb-4">
+                  With your Sun in the 10th House, career and public recognition are central to your life purpose. You're destined 
+                  for roles that involve communication, creativity, and helping others. Your versatile {summary.sun_sign || 'Gemini'} energy combined with 
+                  compassion makes you excellent in fields where you can use both intellect and empathy.
+                </p>
+              </div>
+              
+              <div className="bg-white/60 rounded-2xl p-6">
+                <h3 className="font-display font-semibold text-foreground mb-3">Ideal Career Paths</h3>
+                <div className="grid md:grid-cols-2 gap-3">
+                  {[
+                    'Writer/Author',
+                    'Counselor/Therapist',
+                    'Teacher/Educator',
+                    'Marketing/PR',
+                    'Creative Director',
+                    'Psychology/Research',
+                  ].map((career) => (
+                    <div key={career} className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-blue-200">
+                      <div className="w-2 h-2 rounded-full bg-blue-500" />
+                      <span className="text-foreground/80">{career}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+        
+        {/* Strengths & Challenges */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-12"
+        >
+          <h2 className="text-3xl font-display font-bold text-foreground mb-6">Personality Insights</h2>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Strengths */}
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl border border-green-200 p-6 shadow-lg">
+              <h3 className="font-display font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Sparkles className="w-6 h-6 text-green-600" />
+                Your Strengths
+              </h3>
+              <ul className="space-y-3">
+                {strengths.map((strength) => (
+                  <li key={strength} className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Star className="w-4 h-4 text-white fill-white" />
+                    </div>
+                    <span className="text-foreground/80">{strength}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            {/* Challenges */}
+            <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-3xl border border-amber-200 p-6 shadow-lg">
+              <h3 className="font-display font-semibold text-foreground mb-4 flex items-center gap-2">
+                <TrendingUp className="w-6 h-6 text-amber-600" />
+                Growth Areas
+              </h3>
+              <ul className="space-y-3">
+                {challenges.map((challenge) => (
+                  <li key={challenge} className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <div className="w-2 h-2 rounded-full bg-white" />
+                    </div>
+                    <span className="text-foreground/80">{challenge}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </motion.div>
+        
+        {/* AI-Generated Insights */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-12"
+        >
+          <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-3xl border-2 border-primary/20 p-8 shadow-lg">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
+                <Sparkles className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-display font-bold text-foreground">AI Cosmic Guidance</h2>
+                <p className="text-foreground/70">Personalized insights from your AI astrology guide</p>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <blockquote className="border-l-4 border-primary pl-6 py-2">
+                <p className="text-foreground/90 leading-relaxed italic mb-2">
+                  "Your chart reveals a beautiful balance between mental brilliance and emotional depth. This is your superpower—
+                  you can think with your heart and feel with your mind. Embrace this duality rather than seeing it as contradiction."
+                </p>
+              </blockquote>
+              
+              <blockquote className="border-l-4 border-accent pl-6 py-2">
+                <p className="text-foreground/90 leading-relaxed italic mb-2">
+                  "The coming months bring powerful transits to your career sector. Jupiter's influence suggests expansion 
+                  and recognition. Trust your intuition when opportunities arise—your {summary.moon_sign || 'Pisces'} Moon knows the way."
+                </p>
+              </blockquote>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </div>
   );
 }
 
