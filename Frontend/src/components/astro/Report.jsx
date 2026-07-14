@@ -9,11 +9,11 @@ function Report({ report }) {
   const summary = report?.chart_summary || {};
   
   const planets = [
-    { name: 'Sun', sign: summary.sun_sign || 'Gemini', house: '10th House', degree: '15°', icon: SunIcon, color: 'from-yellow-400 to-orange-500' },
-    { name: 'Moon', sign: summary.moon_sign || 'Pisces', house: '7th House', degree: '22°', icon: Moon, color: 'from-blue-400 to-purple-500' },
-    { name: 'Mercury', sign: 'Gemini', house: '10th House', degree: '18°', icon: Sparkles, color: 'from-green-400 to-teal-500' },
-    { name: 'Venus', sign: 'Taurus', house: '9th House', degree: '8°', icon: Heart, color: 'from-pink-400 to-rose-500' },
-    { name: 'Mars', sign: 'Leo', house: '12th House', degree: '25°', icon: TrendingUp, color: 'from-red-400 to-orange-500' },
+    { name: 'Sun', sign: summary.planets?.sun?.sign || summary.sun_sign || 'Gemini', house: '10th House', degree: summary.planets?.sun?.longitude ? `${Math.floor(summary.planets.sun.longitude % 30)}°` : '15°', icon: SunIcon, color: 'from-yellow-400 to-orange-500' },
+    { name: 'Moon', sign: summary.planets?.moon?.sign || summary.moon_sign || 'Pisces', house: '7th House', degree: summary.planets?.moon?.longitude ? `${Math.floor(summary.planets.moon.longitude % 30)}°` : '22°', icon: Moon, color: 'from-blue-400 to-purple-500' },
+    { name: 'Mercury', sign: summary.planets?.mercury?.sign || 'Gemini', house: '10th House', degree: summary.planets?.mercury?.longitude ? `${Math.floor(summary.planets.mercury.longitude % 30)}°` : '18°', icon: Sparkles, color: 'from-green-400 to-teal-500' },
+    { name: 'Venus', sign: summary.planets?.venus?.sign || 'Taurus', house: '9th House', degree: summary.planets?.venus?.longitude ? `${Math.floor(summary.planets.venus.longitude % 30)}°` : '8°', icon: Heart, color: 'from-pink-400 to-rose-500' },
+    { name: 'Mars', sign: summary.planets?.mars?.sign || 'Leo', house: '12th House', degree: summary.planets?.mars?.longitude ? `${Math.floor(summary.planets.mars.longitude % 30)}°` : '25°', icon: TrendingUp, color: 'from-red-400 to-orange-500' },
   ];
   
   const strengths = [

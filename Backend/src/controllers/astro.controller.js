@@ -97,6 +97,9 @@ IMPORTANT RULES:
 - Each section must be concise but meaningful: 2-4 brief points, not long essays
 - Write like a specialist astrologer, not like a generic chatbot
 - Make the output feel difficult to get from a normal AI chat by connecting chart facts, past patterns, timing windows, and practical actions
+- Use the CALCULATED_CHART exactly as provided. It includes the user's Vimshottari Mahadasha and exact sidereal planetary placements.
+- **CRITICAL**: You MUST use the user's `current_mahadasha` to ground your `future_prediction` timeline and `career_and_education` advice.
+- You MUST mention specific planetary placements (e.g., "Venus in Libra") in your insights.
 - Use phrases like "your chart suggests", "you may have", and "this can show up as" instead of absolute claims
 - Use the CALCULATED_CHART exactly as provided
 - Do not recalculate, change, or guess the sun sign, moon sign, or nakshatra
@@ -122,6 +125,8 @@ OUTPUT FORMAT:
     "sun_sign": "${chart.sun_sign}",
     "moon_sign": "${chart.moon_sign}",
     "moon_nakshatra": "${chart.moon_nakshatra}",
+    "current_mahadasha": "${chart.current_mahadasha}",
+    "planets": ${JSON.stringify(chart.planets)},
     "timezone_assumption": "${chart.timezone_assumption}"
   },
   "quick_summary": {
