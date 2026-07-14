@@ -1,7 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
 
+/* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind base;
+/* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind components;
+/* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind utilities;
 
 @layer base {
@@ -68,27 +71,60 @@
 
 @layer components {
   .aistro-glass {
-    @apply border border-purple-100 bg-white/80 shadow-lg backdrop-blur-sm;
+    border: 1px solid #e9d5ff;
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(4px);
   }
 
   .aistro-page {
-    @apply min-h-screen bg-gradient-to-br from-purple-50/50 via-white to-violet-50/50;
+    min-height: 100vh;
+    background: linear-gradient(to bottom right, rgba(245, 243, 255, 0.5), rgba(255, 255, 255, 1), rgba(245, 240, 255, 0.5));
   }
 
   .aistro-shell {
-    @apply min-h-screen bg-gradient-to-br from-purple-50/50 via-white to-violet-50/50 text-foreground;
+    min-height: 100vh;
+    background: linear-gradient(to bottom right, rgba(245, 243, 255, 0.5), rgba(255, 255, 255, 1), rgba(245, 240, 255, 0.5));
+    color: var(--foreground);
   }
 
   .aistro-container {
-    @apply relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+    position: relative;
+    z-index: 10;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    max-width: 80rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .aistro-container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .aistro-container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
   }
 
   .aistro-title {
-    @apply font-display font-bold leading-tight text-foreground;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--foreground);
   }
 
   .aistro-kicker {
-    @apply text-xs font-bold uppercase tracking-[0.18em] text-primary;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--primary);
   }
 
   .aistro-muted {
@@ -96,37 +132,108 @@
   }
 
   .aistro-card {
-    @apply rounded-3xl border border-purple-100 bg-white/80 p-6 shadow-lg backdrop-blur-sm;
+    border-radius: 1.5rem;
+    border: 1px solid #e9d5ff;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 1.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(4px);
   }
 
   .aistro-panel {
-    @apply rounded-2xl border border-purple-100 bg-white/70 p-4;
+    border-radius: 1rem;
+    border: 1px solid #e9d5ff;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 1rem;
   }
 
   .aistro-chip {
-    @apply inline-flex items-center justify-center rounded-full border border-purple-100 bg-white/75 px-4 py-2 text-sm font-semibold shadow-sm backdrop-blur-sm;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    border: 1px solid #e9d5ff;
+    background-color: rgba(255, 255, 255, 0.75);
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(4px);
     color: rgba(30, 27, 75, 0.75);
   }
 
   .aistro-input {
-    @apply w-full rounded-2xl border-2 border-transparent bg-input-background px-4 py-3 outline-none transition-all focus:border-primary;
+    width: 100%;
+    border-radius: 1rem;
+    border: 2px solid transparent;
+    background-color: var(--input-background);
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+
+  .aistro-input:focus {
+    border-color: var(--primary);
   }
 
   .aistro-status-success {
-    @apply rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700;
+    border-radius: 1rem;
+    border: 1px solid #dcfce7;
+    background-color: #f0fdf4;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #15803d;
   }
 
   .aistro-status-error {
-    @apply rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700;
+    border-radius: 1rem;
+    border: 1px solid #fecaca;
+    background-color: #fef2f2;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #b91c1c;
   }
 
   .aistro-skeleton {
-    @apply animate-pulse rounded-2xl bg-purple-100/70;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    border-radius: 1rem;
+    background-color: rgba(168, 85, 247, 0.3);
   }
 
   .aistro-button-primary {
-    @apply inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 font-medium text-primary-foreground shadow-lg transition-all disabled:cursor-not-allowed disabled:opacity-60;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background-color: var(--primary);
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    font-weight: 500;
+    color: var(--primary-foreground);
     box-shadow: 0 18px 38px rgba(109, 74, 255, 0.24);
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .aistro-button-primary:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 
   .aistro-button-primary:hover {
@@ -134,10 +241,36 @@
   }
 
   .aistro-button-secondary {
-    @apply inline-flex items-center justify-center rounded-full bg-secondary px-6 py-3 font-medium text-secondary-foreground transition-all disabled:cursor-not-allowed disabled:opacity-60;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background-color: var(--secondary);
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    font-weight: 500;
+    color: var(--secondary-foreground);
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .aistro-button-secondary:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 
   .aistro-button-secondary:hover {
     background: rgba(243, 238, 255, 0.8);
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
   }
 }
