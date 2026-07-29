@@ -40,9 +40,10 @@ const getNakshatra = (longitude) => {
   };
 };
 
-const getLahiriAyanamsa = (julianDay) => {
-  const tropicalYear = 365.2425;
-  const yearsSinceJ2000 = (julianDay - 2451545.0) / tropicalYear;
+const getLahiriAyanamsa = (date) => {
+  const j2000 = new Date(Date.UTC(2000, 0, 1, 12, 0, 0));
+  const daysSinceJ2000 = (date.getTime() - j2000.getTime()) / (1000 * 60 * 60 * 24);
+  const yearsSinceJ2000 = daysSinceJ2000 / 365.2425;
   return 23.85675 + 0.013968 * yearsSinceJ2000;
 };
 
@@ -178,8 +179,7 @@ const calculatePositionsForTime = (time, ayanamsa, ascendantSignIndex) => {
 const calculateVedicChart = async ({ dob, tob, place }) => {
   const birthDateUtc = getBirthDateUtc({ dob, tob, place });
   const time = new Astronomy.AstroTime(birthDateUtc);
-  const julianDay = time.jd;
-  const ayanamsa = getLahiriAyanamsa(julianDay);
+  const ayanamsa = getLahiriAyanamsa(birthDateUtc);
   
   // Geocode and Ascendant
   const coords = await getCoordinates(place);
@@ -194,9 +194,9 @@ const calculateVedicChart = async ({ dob, tob, place }) => {
   const dasha = calculateDasha(birthDateUtc, nakshatraData.index, nakshatraData.degreeLeft);
 
   // Calculate Transits
-  const nowTime = new Astronomy.AstroTime(new Date());
-  const nowJulian = nowTime.jd;
-  const nowAyanamsa = getLahiriAyanamsa(nowJulian);
+  const now = new Date();
+  const nowTime = new Astronomy.AstroTime(now);
+  const nowAyanamsa = getLahiriAyanamsa(now);
   // House placements of transits are relative to the natal Ascendant
   const transits = calculatePositionsForTime(nowTime, nowAyanamsa, ascendantSignIndex);
 
