@@ -94,15 +94,15 @@ function Report({ report }) {
                   <TrendingUp className="w-10 h-10 text-white" />
                 </div>
                 <h3 className="font-display font-semibold text-foreground mb-1">Rising Sign</h3>
-                <p className="text-2xl font-display text-primary">Leo</p>
+                <p className="text-2xl font-display text-primary">{summary.ascendant?.sign || 'Leo'}</p>
                 <p className="text-sm text-foreground/60">Your Outer Persona</p>
               </div>
             </div>
             
             <div className="bg-gradient-to-r from-purple-50 to-violet-50 rounded-2xl p-6 border-l-4 border-primary">
               <p className="text-foreground/80 leading-relaxed">
-                <span className="font-semibold text-foreground">Your essence:</span> You are a naturally curious and communicative soul ({summary.sun_sign || 'Gemini'} Sun) 
-                with deep emotional wisdom and intuition ({summary.moon_sign || 'Pisces'} Moon), presenting yourself to the world with confidence and warmth (Leo Rising). 
+                <span className="font-semibold text-foreground">Your essence:</span> You are a naturally curious and communicative soul ({summary.planets?.sun?.sign || summary.sun_sign || 'Gemini'} Sun) 
+                with deep emotional wisdom and intuition ({summary.planets?.moon?.sign || summary.moon_sign || 'Pisces'} Moon), presenting yourself to the world with confidence and warmth ({summary.ascendant?.sign || 'Leo'} Rising). 
                 This unique combination makes you both intellectually brilliant and emotionally profound.
               </p>
             </div>

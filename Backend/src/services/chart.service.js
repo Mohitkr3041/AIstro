@@ -1,18 +1,9 @@
 const Astronomy = require("astronomy-engine");
+const axios = require("axios");
 
 const SIGNS = [
-  "Aries",
-  "Taurus",
-  "Gemini",
-  "Cancer",
-  "Leo",
-  "Virgo",
-  "Libra",
-  "Scorpio",
-  "Sagittarius",
-  "Capricorn",
-  "Aquarius",
-  "Pisces",
+  "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", 
+  "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
 ];
 
 const NAKSHATRAS = [
@@ -37,14 +28,15 @@ const DASHA_LORDS = [
 
 const normalizeDegrees = (degrees) => ((degrees % 360) + 360) % 360;
 
-const getSign = (longitude) => SIGNS[Math.floor(normalizeDegrees(longitude) / 30)];
+const getSignIndex = (longitude) => Math.floor(normalizeDegrees(longitude) / 30);
+const getSign = (longitude) => SIGNS[getSignIndex(longitude)];
 
 const getNakshatra = (longitude) => {
   const segment = 360 / 27; // 13.3333 degrees
   return {
     name: NAKSHATRAS[Math.floor(normalizeDegrees(longitude) / segment)],
     index: Math.floor(normalizeDegrees(longitude) / segment),
-    degreeLeft: (segment - (normalizeDegrees(longitude) % segment)) / segment // Percentage of nakshatra remaining
+    degreeLeft: (segment - (normalizeDegrees(longitude) % segment)) / segment
   };
 };
 
@@ -54,12 +46,43 @@ const getLahiriAyanamsa = (julianDay) => {
   return 23.85675 + 0.013968 * yearsSinceJ2000;
 };
 
+const getCoordinates = async (place) => {
+  try {
+      const res = await axios.get(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(place)}&format=json&limit=1`, {
+          headers: { 'User-Agent': 'AIstro/1.0' }
+      });
+      if (res.data && res.data.length > 0) {
+          return { lat: parseFloat(res.data[0].lat), lon: parseFloat(res.data[0].lon) };
+      }
+  } catch (e) {
+      console.error("Geocoding failed:", e.message);
+  }
+  return { lat: 28.6139, lon: 77.2090 }; // Default to Delhi
+};
+
+const calculateAscendant = (time, lat, lon) => {
+  const gast = Astronomy.SiderealTime(time);
+  let lstHours = gast + (lon / 15);
+  lstHours = ((lstHours % 24) + 24) % 24;
+  const ramc = lstHours * 15;
+  
+  const rad = Math.PI / 180;
+  const e = 23.4392911; 
+  
+  const y = Math.cos(ramc * rad);
+  const x = - (Math.sin(ramc * rad) * Math.cos(e * rad) + Math.tan(lat * rad) * Math.sin(e * rad));
+  
+  let asc = Math.atan2(y, x) / rad;
+  asc = ((asc % 360) + 360) % 360;
+  return asc;
+};
+
 const getTimezoneOffsetMinutes = (place = "") => {
   const normalizedPlace = place.toLowerCase();
   if (normalizedPlace.includes("india") || normalizedPlace.includes("jharkhand")) {
-    return 330; // UTC+5:30
+    return 330;
   }
-  return 330; // Defaulting to IST for now
+  return 330; 
 };
 
 const getBirthDateUtc = ({ dob, tob, place }) => {
@@ -75,76 +98,122 @@ const getPlanetLongitude = (body, time) => {
   return normalizeDegrees(lonLat.elon);
 };
 
-const calculateCurrentDasha = (birthDateUtc, moonNakshatraIndex, degreeLeft) => {
-  // Finding starting dasha
+const calculateDasha = (birthDateUtc, moonNakshatraIndex, degreeLeft) => {
   let dashaIndex = moonNakshatraIndex % 9;
   let startingDasha = DASHA_LORDS[dashaIndex];
-  
-  // Balance of dasha at birth in years
   let balanceYears = startingDasha.years * degreeLeft;
-  
   let currentAge = (Date.now() - birthDateUtc.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
   
+  let accumulatedYears = 0;
+  let currentIndex = dashaIndex;
+  
+  // Find Mahadasha
   if (currentAge < balanceYears) {
-    return startingDasha.lord;
+      accumulatedYears = 0;
+      // time passed in current mahadasha
+      let passedInMahadasha = currentAge; 
+      return findAntardasha(startingDasha, passedInMahadasha, currentIndex);
   }
   
-  let accumulatedYears = balanceYears;
-  let currentIndex = (dashaIndex + 1) % 9;
+  accumulatedYears = balanceYears;
+  currentIndex = (currentIndex + 1) % 9;
   
   while (accumulatedYears < currentAge && accumulatedYears < 120) {
     let lordYears = DASHA_LORDS[currentIndex].years;
     if (accumulatedYears + lordYears > currentAge) {
-      return DASHA_LORDS[currentIndex].lord;
+      let passedInMahadasha = currentAge - accumulatedYears;
+      return findAntardasha(DASHA_LORDS[currentIndex], passedInMahadasha, currentIndex);
     }
     accumulatedYears += lordYears;
     currentIndex = (currentIndex + 1) % 9;
   }
   
-  return DASHA_LORDS[currentIndex].lord; // fallback
+  return { mahadasha: DASHA_LORDS[currentIndex].lord, antardasha: DASHA_LORDS[currentIndex].lord };
 };
 
-const calculateVedicChart = ({ dob, tob, place }) => {
+const findAntardasha = (mahadashaLord, yearsPassed, mahaIndex) => {
+    let adAccumulated = 0;
+    let adIndex = mahaIndex; // Antardasha sequence starts from the Mahadasha lord
+    
+    for (let i = 0; i < 9; i++) {
+        let adLord = DASHA_LORDS[adIndex];
+        let adYears = (mahadashaLord.years * adLord.years) / 120; // Proportional length
+        
+        if (adAccumulated + adYears > yearsPassed) {
+            return {
+                mahadasha: mahadashaLord.lord,
+                antardasha: adLord.lord
+            };
+        }
+        adAccumulated += adYears;
+        adIndex = (adIndex + 1) % 9;
+    }
+    
+    return { mahadasha: mahadashaLord.lord, antardasha: mahadashaLord.lord };
+};
+
+const getHouse = (planetSignIndex, ascendantSignIndex) => {
+    return ((planetSignIndex - ascendantSignIndex + 12) % 12) + 1;
+};
+
+const calculatePositionsForTime = (time, ayanamsa, ascendantSignIndex) => {
+    const planets = ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"];
+    const siderealPositions = {};
+    
+    planets.forEach(planet => {
+      const tropicalLong = getPlanetLongitude(planet, time);
+      const siderealLong = normalizeDegrees(tropicalLong - ayanamsa);
+      const signIndex = getSignIndex(siderealLong);
+      
+      siderealPositions[planet.toLowerCase()] = {
+        longitude: Number(siderealLong.toFixed(2)),
+        sign: SIGNS[signIndex],
+        house: ascendantSignIndex !== null ? getHouse(signIndex, ascendantSignIndex) : null
+      };
+    });
+    
+    return siderealPositions;
+};
+
+const calculateVedicChart = async ({ dob, tob, place }) => {
   const birthDateUtc = getBirthDateUtc({ dob, tob, place });
   const time = new Astronomy.AstroTime(birthDateUtc);
-  
-  // Julian Day for Ayanamsa
   const julianDay = time.jd;
   const ayanamsa = getLahiriAyanamsa(julianDay);
   
-  const planets = ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"];
-  const siderealPositions = {};
+  // Geocode and Ascendant
+  const coords = await getCoordinates(place);
+  const tropicalAsc = calculateAscendant(time, coords.lat, coords.lon);
+  const siderealAsc = normalizeDegrees(tropicalAsc - ayanamsa);
+  const ascendantSignIndex = getSignIndex(siderealAsc);
   
-  planets.forEach(planet => {
-    const tropicalLong = getPlanetLongitude(planet, time);
-    const siderealLong = normalizeDegrees(tropicalLong - ayanamsa);
-    
-    siderealPositions[planet.toLowerCase()] = {
-      longitude: Number(siderealLong.toFixed(2)),
-      sign: getSign(siderealLong)
-    };
-  });
+  const siderealPositions = calculatePositionsForTime(time, ayanamsa, ascendantSignIndex);
   
   const moonSidereal = siderealPositions.moon.longitude;
   const nakshatraData = getNakshatra(moonSidereal);
-  
-  // Approximate Rahu/Ketu
-  // Lunar nodes move approx 19.34 degrees per year backwards
-  // Precise calculation requires more complex algorithms, but we can do a basic approximation or omit them for now.
-  // We'll skip Rahu/Ketu in the basic planets for now, as Astronomy Engine handles main bodies perfectly.
-  
-  // Calculate Dasha
-  const currentMahadasha = calculateCurrentDasha(birthDateUtc, nakshatraData.index, nakshatraData.degreeLeft);
+  const dasha = calculateDasha(birthDateUtc, nakshatraData.index, nakshatraData.degreeLeft);
+
+  // Calculate Transits
+  const nowTime = new Astronomy.AstroTime(new Date());
+  const nowJulian = nowTime.jd;
+  const nowAyanamsa = getLahiriAyanamsa(nowJulian);
+  // House placements of transits are relative to the natal Ascendant
+  const transits = calculatePositionsForTime(nowTime, nowAyanamsa, ascendantSignIndex);
 
   return {
     zodiac_system: "Vedic sidereal",
     ayanamsa: "Lahiri",
     timezone_assumption: "Asia/Kolkata (UTC+05:30)",
+    ascendant: {
+        sign: SIGNS[ascendantSignIndex],
+        longitude: Number(siderealAsc.toFixed(2))
+    },
     sun_sign: siderealPositions.sun.sign,
     moon_sign: siderealPositions.moon.sign,
     moon_nakshatra: nakshatraData.name,
-    current_mahadasha: currentMahadasha,
-    planets: siderealPositions
+    dasha: dasha,
+    planets: siderealPositions,
+    current_transits: transits
   };
 };
 

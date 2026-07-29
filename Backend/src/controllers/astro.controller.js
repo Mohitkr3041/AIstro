@@ -75,7 +75,7 @@ const generatePrediction = async (req, res) => {
       });
     }
 
-    const chart = calculateVedicChart({ dob, tob, place });
+    const chart = await calculateVedicChart({ dob, tob, place });
 
     const prompt = `
 You are AIstro, a professional Vedic astrologer and modern life guide.
@@ -97,9 +97,9 @@ IMPORTANT RULES:
 - Each section must be concise but meaningful: 2-4 brief points, not long essays
 - Write like a specialist astrologer, not like a generic chatbot
 - Make the output feel difficult to get from a normal AI chat by connecting chart facts, past patterns, timing windows, and practical actions
-- Use the CALCULATED_CHART exactly as provided. It includes the user's Vimshottari Mahadasha and exact sidereal planetary placements.
-- **CRITICAL**: You MUST use the user's `current_mahadasha` to ground your `future_prediction` timeline and `career_and_education` advice.
-- You MUST mention specific planetary placements (e.g., "Venus in Libra") in your insights.
+- Use the CALCULATED_CHART exactly as provided. It includes the user's true Ascendant, house placements, exact Vimshottari Mahadasha/Antardasha, and current real-time transits.
+- **CRITICAL**: You MUST use the user's dasha (Mahadasha and Antardasha) and current_transits to ground your future_prediction timeline and career_and_education advice.
+- You MUST mention specific planetary house placements (e.g., "Venus in your 7th house") in your insights.
 - Use phrases like "your chart suggests", "you may have", and "this can show up as" instead of absolute claims
 - Use the CALCULATED_CHART exactly as provided
 - Do not recalculate, change, or guess the sun sign, moon sign, or nakshatra
@@ -122,11 +122,13 @@ OUTPUT FORMAT:
   "chart_summary": {
     "zodiac_system": "${chart.zodiac_system}",
     "ayanamsa": "${chart.ayanamsa}",
+    "ascendant": ${JSON.stringify(chart.ascendant)},
     "sun_sign": "${chart.sun_sign}",
     "moon_sign": "${chart.moon_sign}",
     "moon_nakshatra": "${chart.moon_nakshatra}",
-    "current_mahadasha": "${chart.current_mahadasha}",
+    "dasha": ${JSON.stringify(chart.dasha)},
     "planets": ${JSON.stringify(chart.planets)},
+    "current_transits": ${JSON.stringify(chart.current_transits)},
     "timezone_assumption": "${chart.timezone_assumption}"
   },
   "quick_summary": {
