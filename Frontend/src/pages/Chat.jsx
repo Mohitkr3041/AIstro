@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Send, Sparkles, Moon, Heart, Briefcase, TrendingUp, Star, Bot } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { motion, AnimatePresence } from 'motion/react';
 import { askAstroChat, getChatHistory } from '../services/chat.service';
 
 function ChatPage() {
+  const location = useLocation();
   const [messages, setMessages] = useState([
     {
       id: '1',
@@ -48,6 +50,20 @@ function ChatPage() {
 
     loadHistory();
   }, []);
+
+  // Auto-send if navigated from Report "Ask Oracle" button with an initialPrompt
+  useEffect(() => {
+    const initialPrompt = location.state?.initialPrompt;
+    if (initialPrompt) {
+      // Small delay to let chat history load first, then auto-send
+      const timer = setTimeout(() => {
+        handleSend(initialPrompt);
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

@@ -4,7 +4,7 @@ const { generateAstroReading } = require("../services/gemini.service");
 const { calculateNatalChart } = require("../services/astrology/astrologyEngine");
 const { analyzeChart } = require("../services/astrology/rules/ruleEngine");
 // Phase 3 — Grounded Prediction Engine
-const { generateGroundedPredictions, prepareEvidenceOnly, prepareGroundedEvidence } = require("../services/astrology/prediction");
+const { generateGroundedPredictions, prepareEvidenceOnly, prepareGroundedEvidence, buildFullAstrologyReport } = require("../services/astrology/prediction");
 const crypto = require("crypto");
 
 const extractJsonObject = (text) => {
@@ -428,6 +428,9 @@ const generateGroundedReport = async (req, res) => {
     const { name, dob, tob, place } = birth;
     const domains = req.body?.domains || undefined; // optional domain filter
 
+    const { chart, analysis, groundedEvidence, dasha, transits } = await prepareEvidenceOnly({ dob, tob, place });
+    const fullReport = buildFullAstrologyReport({ chart, analysis, groundedEvidence, dasha, transits });
+
     const result = await generateGroundedPredictions(
       { dob, tob, place, name },
       { domains }
@@ -439,6 +442,7 @@ const generateGroundedReport = async (req, res) => {
       chartMetadata: result.chartMetadata,
       scoringMethodology: result.scoringMethodology,
       predictions: result.predictions,
+      report: fullReport,
     });
   } catch (error) {
     console.error("Grounded prediction failed:", error);
@@ -474,7 +478,8 @@ const getGroundedEvidence = async (req, res) => {
     }
 
     const { dob, tob, place } = birth;
-    const { chart, analysis, groundedEvidence } = await prepareEvidenceOnly({ dob, tob, place });
+    const { chart, analysis, groundedEvidence, dasha, transits } = await prepareEvidenceOnly({ dob, tob, place });
+    const fullReport = buildFullAstrologyReport({ chart, analysis, groundedEvidence, dasha, transits });
 
     res.json({
       message: "Grounded astrological evidence prepared",
@@ -483,6 +488,9 @@ const getGroundedEvidence = async (req, res) => {
       domainEvidence: groundedEvidence.domainEvidence,
       yogas: groundedEvidence.yogas,
       dignities: groundedEvidence.dignities,
+      dasha: groundedEvidence.dasha,
+      transits: groundedEvidence.transits,
+      report: fullReport,
     });
   } catch (error) {
     console.error("Evidence preparation failed:", error);
@@ -491,3 +499,4 @@ const getGroundedEvidence = async (req, res) => {
 };
 
 module.exports = { generatePrediction, generateGroundedReport, getGroundedEvidence };
+

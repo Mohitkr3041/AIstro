@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { generateAstroReport } from "../services/astro.service";
+import { getGroundedReport } from "../services/astro.service";
 import Report from "../components/astro/Report";
 
 function ReportPage() {
@@ -15,9 +15,11 @@ function ReportPage() {
       setLoadingReport(true);
       setReportError("");
       setNotice("");
-      const res = await generateAstroReport({ forceRefresh });
-      setReport(res.data.data);
-      setNotice(res.data.cached ? "Loaded your saved astrology report." : "Generated a fresh astrology report.");
+      const res = await getGroundedReport({ forceRefresh });
+      // Grounded report returns { report, predictions, chartMetadata, ... }
+      // Pass the full response data so Report.jsx can normalize it
+      setReport(res.data);
+      setNotice("Your grounded astrology report is ready.");
     } catch (error) {
       setReportError(
         error.response?.data?.message ||
