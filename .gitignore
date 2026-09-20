@@ -2,3 +2,9 @@
 .env
 dist/
 build/
+
+
+.agents/
+
+
+Backend/tests/

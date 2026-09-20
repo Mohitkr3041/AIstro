@@ -1,7 +1,10 @@
 const BirthDetails = require("../models/birth.model");
 const AstroReport = require("../models/report.model");
 const { generateAstroReading } = require("../services/gemini.service");
-const { calculateVedicChart } = require("../services/chart.service");
+const { calculateNatalChart } = require("../services/astrology/astrologyEngine");
+const { analyzeChart } = require("../services/astrology/rules/ruleEngine");
+// Phase 3 — Grounded Prediction Engine
+const { generateGroundedPredictions, prepareEvidenceOnly } = require("../services/astrology/prediction");
 const crypto = require("crypto");
 
 const extractJsonObject = (text) => {
@@ -75,7 +78,9 @@ const generatePrediction = async (req, res) => {
       });
     }
 
-    const chart = await calculateVedicChart({ dob, tob, place });
+    const chart = await calculateNatalChart({ dob, tob, place });
+    const analysis = analyzeChart(chart);
+    const groundedEvidence = prepareGroundedEvidence(analysis);
 
     const prompt = `
 You are AIstro, a professional Vedic astrologer and modern life guide.
@@ -97,8 +102,7 @@ IMPORTANT RULES:
 - Each section must be concise but meaningful: 2-4 brief points, not long essays
 - Write like a specialist astrologer, not like a generic chatbot
 - Make the output feel difficult to get from a normal AI chat by connecting chart facts, past patterns, timing windows, and practical actions
-- Use the CALCULATED_CHART exactly as provided. It includes the user's true Ascendant, house placements, exact Vimshottari Mahadasha/Antardasha, and current real-time transits.
-- **CRITICAL**: You MUST use the user's dasha (Mahadasha and Antardasha) and current_transits to ground your future_prediction timeline and career_and_education advice.
+- Use the CALCULATED_CHART exactly as provided. It includes the user's true Ascendant, house placements, and deterministic astrological evidence.
 - You MUST mention specific planetary house placements (e.g., "Venus in your 7th house") in your insights.
 - Use phrases like "your chart suggests", "you may have", and "this can show up as" instead of absolute claims
 - Use the CALCULATED_CHART exactly as provided
@@ -117,24 +121,26 @@ INPUT:
 CALCULATED_CHART:
 ${JSON.stringify(chart, null, 2)}
 
+DETERMINISTIC_EVIDENCE:
+${JSON.stringify(groundedEvidence.domainEvidence, null, 2)}
+
 OUTPUT FORMAT:
 {
   "chart_summary": {
     "zodiac_system": "${chart.zodiac_system}",
-    "ayanamsa": "${chart.ayanamsa}",
+    "ayanamsa": "${chart.ayanamsha?.name || "Lahiri"}",
     "ascendant": ${JSON.stringify(chart.ascendant)},
     "sun_sign": "${chart.sun_sign}",
     "moon_sign": "${chart.moon_sign}",
-    "moon_nakshatra": "${chart.moon_nakshatra}",
-    "dasha": ${JSON.stringify(chart.dasha)},
+    "moon_nakshatra": "${chart.nakshatra?.name || ""}",
     "planets": ${JSON.stringify(chart.planets)},
-    "current_transits": ${JSON.stringify(chart.current_transits)},
-    "timezone_assumption": "${chart.timezone_assumption}"
+    "timezone_assumption": "${chart.birthData?.timezone || ""}"
   },
   "quick_summary": {
     "personality": "",
     "strength": "",
     "relationship_style": "",
+
     "career_direction": "",
     "next_30_days_highlight": ""
   },
@@ -396,4 +402,92 @@ Return only valid JSON.
   }
 };
 
-module.exports = { generatePrediction };
+// =============================================================================
+// Phase 3 — Grounded Prediction Controller
+// =============================================================================
+
+/**
+ * GET /api/astro/grounded-report
+ *
+ * Full Phase 3 pipeline: Swiss Ephemeris → Rule Engine → Evidence → Gemini (grounded).
+ * Returns structured domain predictions with full evidence traceability.
+ *
+ * NOTE: The old generatePrediction route remains unchanged for backward compatibility.
+ */
+const generateGroundedReport = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const birth = await BirthDetails.findOne({ userId });
+
+    if (!birth) {
+      return res.status(404).json({
+        message: "Birth details not found. Please save your birth details first.",
+      });
+    }
+
+    const { name, dob, tob, place } = birth;
+    const domains = req.body?.domains || undefined; // optional domain filter
+
+    const result = await generateGroundedPredictions(
+      { dob, tob, place, name },
+      { domains }
+    );
+
+    res.json({
+      message: "Grounded astrology predictions generated",
+      engineVersion: result.engineVersion,
+      chartMetadata: result.chartMetadata,
+      scoringMethodology: result.scoringMethodology,
+      predictions: result.predictions,
+    });
+  } catch (error) {
+    console.error("Grounded prediction failed:", error);
+
+    if (error.code === "BIRTH_LOCATION_UNRESOLVED") {
+      return res.status(422).json({ message: "Birth location could not be resolved. Please check your birth place." });
+    }
+    if (error.code === "INVALID_BIRTH_DATA") {
+      return res.status(400).json({ message: "Invalid birth data." });
+    }
+
+    res.status(500).json({
+      message: getPredictionErrorMessage(error),
+    });
+  }
+};
+
+/**
+ * GET /api/astro/evidence
+ *
+ * Returns Phase 1 + Phase 2 + normalized evidence WITHOUT calling Gemini.
+ * Useful for debugging, auditing, and the chatbot grounding layer.
+ */
+const getGroundedEvidence = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const birth = await BirthDetails.findOne({ userId });
+
+    if (!birth) {
+      return res.status(404).json({
+        message: "Birth details not found. Please save your birth details first.",
+      });
+    }
+
+    const { dob, tob, place } = birth;
+    const { chart, analysis, groundedEvidence } = await prepareEvidenceOnly({ dob, tob, place });
+
+    res.json({
+      message: "Grounded astrological evidence prepared",
+      chartMetadata: groundedEvidence.chartMetadata,
+      scoringMethodology: groundedEvidence.scoringMethodology,
+      domainEvidence: groundedEvidence.domainEvidence,
+      yogas: groundedEvidence.yogas,
+      dignities: groundedEvidence.dignities,
+    });
+  } catch (error) {
+    console.error("Evidence preparation failed:", error);
+    res.status(500).json({ message: "Failed to prepare astrological evidence" });
+  }
+};
+
+module.exports = { generatePrediction, generateGroundedReport, getGroundedEvidence };

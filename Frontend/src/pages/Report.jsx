@@ -1,4 +1,4 @@
-import { Sun as SunIcon, Moon, TrendingUp, Heart, Briefcase, Star, Sparkles, ChevronDown, Calendar, MapPin } from 'lucide-react';
+﻿import { Sun as SunIcon, Moon, TrendingUp, Heart, Briefcase, Star, Sparkles, ChevronDown, Calendar, MapPin } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { Button } from '../components/ui/Button';
@@ -6,34 +6,11 @@ import { generateAstroReport } from '../services/astro.service';
 import { getBirthDetails } from '../services/birth.service';
 
 function ReportPage() {
-  const [expandedSection, setExpandedSection] = useState('sun');
+  const [expandedSection, setExpandedSection] = useState(null);
   const [report, setReport] = useState(null);
   const [birthData, setBirthData] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [reportError, setReportError] = useState('');
-  
-  const planets = [
-    { name: 'Sun', sign: 'Gemini', house: '10th House', degree: '15°', icon: SunIcon, color: 'from-yellow-400 to-orange-500' },
-    { name: 'Moon', sign: 'Pisces', house: '7th House', degree: '22°', icon: Moon, color: 'from-blue-400 to-purple-500' },
-    { name: 'Mercury', sign: 'Gemini', house: '10th House', degree: '18°', icon: Sparkles, color: 'from-green-400 to-teal-500' },
-    { name: 'Venus', sign: 'Taurus', house: '9th House', degree: '8°', icon: Heart, color: 'from-pink-400 to-rose-500' },
-    { name: 'Mars', sign: 'Leo', house: '12th House', degree: '25°', icon: TrendingUp, color: 'from-red-400 to-orange-500' },
-  ];
-  
-  const strengths = [
-    'Natural communicator with gift for words',
-    'Highly adaptable and quick learner',
-    'Creative problem solver',
-    'Empathetic and intuitive',
-    'Strong leadership potential',
-  ];
-  
-  const challenges = [
-    'Tendency to overthink decisions',
-    'Can be emotionally sensitive',
-    'Sometimes scattered focus',
-    'Difficulty saying no to others',
-  ];
 
   const loadReport = async (options = {}) => {
     setIsGenerating(true);
@@ -59,25 +36,69 @@ function ReportPage() {
 
   const chartSummary = report?.chart_summary || {};
   const quickSummary = report?.quick_summary || {};
-  
+  const readingFlow = report?.reading_flow || {};
+  const personalityData = report?.personality_and_mindset || {};
+  const strengthsData = report?.strengths_and_weaknesses || {};
+  const loveData = report?.love_and_relationships || {};
+  const careerData = report?.career_and_education || {};
+
+  // Build planet list dynamically from calculated chart backend data
+  const planetIcons = {
+    sun: SunIcon,
+    moon: Moon,
+    mercury: Sparkles,
+    venus: Heart,
+    mars: TrendingUp,
+    jupiter: Star,
+    saturn: Briefcase,
+    rahu: Sparkles,
+    ketu: Sparkles,
+  };
+
+  const planetColors = {
+    sun: 'from-yellow-400 to-orange-500',
+    moon: 'from-blue-400 to-purple-500',
+    mercury: 'from-green-400 to-teal-500',
+    venus: 'from-pink-400 to-rose-500',
+    mars: 'from-red-400 to-orange-500',
+    jupiter: 'from-amber-400 to-yellow-600',
+    saturn: 'from-indigo-400 to-blue-600',
+    rahu: 'from-purple-500 to-indigo-700',
+    ketu: 'from-gray-400 to-slate-600',
+  };
+
+  const planets = Object.entries(chartSummary.planets || {}).map(([key, p]) => {
+    const name = p.name || key.charAt(0).toUpperCase() + key.slice(1);
+    const sign = p.sign || 'Unknown';
+    const house = p.house ? `${p.house}th House` : 'House unspecified';
+    const degreeStr = typeof p.degree === 'number' ? `${p.degree}°` : (p.degree || '');
+    const icon = planetIcons[key] || Sparkles;
+    const color = planetColors[key] || 'from-primary to-accent';
+
+    return { name, sign, house, degree: degreeStr, icon, color, key };
+  });
+
+  const strengths = strengthsData.strengths?.length
+    ? strengthsData.strengths
+    : ['Analytical thinking and deep observation', 'Intuitive decision making', 'Strong adaptable intellect'];
+
+  const challenges = strengthsData.weaknesses?.length
+    ? strengthsData.weaknesses
+    : ['Overthinking decision options', 'Patience with slow outcomes'];
+
   return (
     <div className="min-h-screen">
       {/* Hero Header */}
       <div className="relative bg-gradient-to-br from-primary via-accent to-primary py-16 px-4 md:px-8">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0ic3RhcnMiIHg9IjAiIHk9IjAiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjMiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjc3RhcnMpIi8+PC9zdmc+')] opacity-30" />
-        
         <div className="relative max-w-5xl mx-auto text-center text-white">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="text-4xl md:text-6xl font-display font-bold mb-4">
               Your Cosmic Blueprint
             </h1>
             <p className="text-xl md:text-2xl text-white/90 mb-6">
-              A Complete Astrology Report
+              A Complete Grounded Astrology Report
             </p>
-            
+
             <div className="flex flex-wrap items-center justify-center gap-6 text-white/80">
               <div className="flex items-center gap-2">
                 <Calendar className="w-5 h-5" />
@@ -105,18 +126,13 @@ function ReportPage() {
           </motion.div>
         </div>
       </div>
-      
+
       <div className="max-w-5xl mx-auto px-4 md:px-8 py-12">
         {/* Natal Chart Summary */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-12"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-12">
           <div className="bg-white/80 backdrop-blur-sm rounded-3xl border border-purple-100 p-8 shadow-lg">
             <h2 className="text-3xl font-display font-bold text-foreground mb-6">Natal Chart Overview</h2>
-            
+
             <div className="grid md:grid-cols-3 gap-8 mb-8">
               <div className="text-center">
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center mx-auto mb-3 shadow-lg">
@@ -126,7 +142,7 @@ function ReportPage() {
                 <p className="text-2xl font-display text-primary">{chartSummary.sun_sign || 'Loading'}</p>
                 <p className="text-sm text-foreground/60">Your Core Identity</p>
               </div>
-              
+
               <div className="text-center">
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center mx-auto mb-3 shadow-lg">
                   <Moon className="w-10 h-10 text-white" />
@@ -135,7 +151,7 @@ function ReportPage() {
                 <p className="text-2xl font-display text-primary">{chartSummary.moon_sign || 'Loading'}</p>
                 <p className="text-sm text-foreground/60">Your Emotional Nature</p>
               </div>
-              
+
               <div className="text-center">
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center mx-auto mb-3 shadow-lg">
                   <TrendingUp className="w-10 h-10 text-white" />
@@ -145,7 +161,7 @@ function ReportPage() {
                 <p className="text-sm text-foreground/60">Your Lunar Pattern</p>
               </div>
             </div>
-            
+
             <div className="bg-gradient-to-r from-purple-50 to-violet-50 rounded-2xl p-6 border-l-4 border-primary">
               <p className="text-foreground/80 leading-relaxed">
                 <span className="font-semibold text-foreground">Your essence:</span> {quickSummary.personality || 'Generate your report to reveal the strongest themes in your chart.'}
@@ -153,16 +169,11 @@ function ReportPage() {
             </div>
           </div>
         </motion.div>
-        
+
         {/* Planet Placements */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-12"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-12">
           <h2 className="text-3xl font-display font-bold text-foreground mb-6">Planetary Placements</h2>
-          
+
           <div className="space-y-4">
             {planets.map((planet) => (
               <div key={planet.name} className="bg-white/80 backdrop-blur-sm rounded-2xl border border-purple-100 overflow-hidden shadow-lg">
@@ -170,35 +181,28 @@ function ReportPage() {
                   <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${planet.color} flex items-center justify-center flex-shrink-0 shadow-lg`}>
                     <planet.icon className="w-7 h-7 text-white" />
                   </div>
-                  
+
                   <div className="flex-1">
                     <h3 className="font-display font-semibold text-lg text-foreground">{planet.name}</h3>
                     <p className="text-foreground/70">
-                      {planet.sign} • {planet.house} • {planet.degree}
+                      {planet.sign} • {planet.house} {planet.degree ? `• ${planet.degree}` : ''}
                     </p>
                   </div>
-                  
+
                   <button
                     onClick={() => setExpandedSection(expandedSection === planet.name.toLowerCase() ? null : planet.name.toLowerCase())}
                     className="w-10 h-10 rounded-xl bg-purple-50 hover:bg-purple-100 flex items-center justify-center transition-colors"
-                    aria-label={expandedSection === planet.name.toLowerCase() ? `Collapse ${planet.name} details` : `Expand ${planet.name} details`}
-                    aria-expanded={expandedSection === planet.name.toLowerCase()}
+                    aria-label={`Toggle ${planet.name} details`}
                   >
-                    <ChevronDown className={`w-5 h-5 text-primary transition-transform ${
-                      expandedSection === planet.name.toLowerCase() ? 'rotate-180' : ''
-                    }`} />
+                    <ChevronDown className={`w-5 h-5 text-primary transition-transform ${expandedSection === planet.name.toLowerCase() ? 'rotate-180' : ''}`} />
                   </button>
                 </div>
-                
+
                 {expandedSection === planet.name.toLowerCase() && (
                   <div className="px-6 pb-6 pt-0">
                     <div className="bg-purple-50 rounded-2xl p-4">
                       <p className="text-foreground/80 leading-relaxed">
-                        {planet.name === 'Sun' && "Your Gemini Sun makes you naturally curious, adaptable, and intellectually driven. You thrive on communication and learning, constantly seeking new information and experiences. Your mind is quick and versatile, making you excellent at multitasking and seeing multiple perspectives."}
-                        {planet.name === 'Moon' && "With your Moon in Pisces, you possess deep emotional sensitivity and powerful intuition. You're naturally empathetic and can easily tune into others' feelings. Your imagination is vivid, and you may find solace in creative or spiritual pursuits."}
-                        {planet.name === 'Mercury' && "Mercury in Gemini gives you exceptional communication skills and mental agility. You're a natural wordsmith who can articulate ideas clearly and persuasively. Your mind works quickly, and you excel at connecting different concepts and ideas."}
-                        {planet.name === 'Venus' && "Venus in Taurus brings a deep appreciation for beauty, comfort, and stability in relationships. You value loyalty and prefer quality over quantity in love. Material security and sensory pleasures are important to you."}
-                        {planet.name === 'Mars' && "Mars in Leo gives you bold, creative energy and natural leadership abilities. You pursue your goals with confidence and passion. You're motivated by recognition and enjoy being in the spotlight for your achievements."}
+                        {planet.name} in {planet.sign} ({planet.house}) — Influences core energies, focus areas, and natural tendencies in your birth chart.
                       </p>
                     </div>
                   </div>
@@ -207,14 +211,9 @@ function ReportPage() {
             ))}
           </div>
         </motion.div>
-        
+
         {/* Love & Relationships */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-12"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-12">
           <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-3xl border border-pink-200 p-8 shadow-lg">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center shadow-lg">
@@ -222,47 +221,27 @@ function ReportPage() {
               </div>
               <h2 className="text-3xl font-display font-bold text-foreground">Love & Relationships</h2>
             </div>
-            
+
             <div className="space-y-4">
               <div>
-                <h3 className="font-display font-semibold text-foreground mb-2">Romantic Nature</h3>
+                <h3 className="font-display font-semibold text-foreground mb-2">Relationship Dynamic</h3>
                 <p className="text-foreground/80 leading-relaxed">
-                  In love, you seek deep emotional and intellectual connection. Your Gemini Sun craves stimulating conversation 
-                  and variety, while your Pisces Moon desires profound emotional intimacy and spiritual bonding. You're romantic, 
-                  imaginative, and value partners who can engage both your mind and heart.
+                  {loveData.relationship_pattern || quickSummary.relationship_style || 'Astrological indicators suggest seeking balance, open communication, and mutual appreciation in partnerships.'}
                 </p>
               </div>
-              
-              <div className="bg-white/60 rounded-2xl p-6">
-                <h3 className="font-display font-semibold text-foreground mb-3">Best Matches</h3>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {['Libra', 'Aquarius', 'Cancer'].map((sign) => (
-                    <div key={sign} className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-pink-200">
-                      <Star className="w-5 h-5 text-pink-500 fill-pink-500" />
-                      <span className="font-medium text-foreground">{sign}</span>
-                    </div>
-                  ))}
+
+              {loveData.partner_type && (
+                <div className="bg-white/60 rounded-2xl p-6">
+                  <h3 className="font-display font-semibold text-foreground mb-2">Partner Dynamics</h3>
+                  <p className="text-foreground/80 leading-relaxed">{loveData.partner_type}</p>
                 </div>
-              </div>
-              
-              <div>
-                <h3 className="font-display font-semibold text-foreground mb-2">Relationship Advice</h3>
-                <p className="text-foreground/80 leading-relaxed">
-                  Balance your need for independence with emotional intimacy. Communicate your feelings clearly, even when they're 
-                  complex. Your ideal partner appreciates your depth, values honest dialogue, and gives you space to explore your interests.
-                </p>
-              </div>
+              )}
             </div>
           </div>
         </motion.div>
-        
+
         {/* Career & Life Path */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-12"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-12">
           <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-3xl border border-blue-200 p-8 shadow-lg">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg">
@@ -270,50 +249,37 @@ function ReportPage() {
               </div>
               <h2 className="text-3xl font-display font-bold text-foreground">Career & Purpose</h2>
             </div>
-            
+
             <div className="space-y-4">
               <div>
-                <h3 className="font-display font-semibold text-foreground mb-2">Professional Strengths</h3>
+                <h3 className="font-display font-semibold text-foreground mb-2">Professional Direction</h3>
                 <p className="text-foreground/80 leading-relaxed mb-4">
-                  With your Sun in the 10th House, career and public recognition are central to your life purpose. You're destined 
-                  for roles that involve communication, creativity, and helping others. Your versatile Gemini energy combined with 
-                  Piscean compassion makes you excellent in fields where you can use both intellect and empathy.
+                  {quickSummary.career_direction || 'Your chart indicates potential in roles that align with your natural strengths and values.'}
                 </p>
               </div>
-              
-              <div className="bg-white/60 rounded-2xl p-6">
-                <h3 className="font-display font-semibold text-foreground mb-3">Ideal Career Paths</h3>
-                <div className="grid md:grid-cols-2 gap-3">
-                  {[
-                    'Writer/Author',
-                    'Counselor/Therapist',
-                    'Teacher/Educator',
-                    'Marketing/PR',
-                    'Creative Director',
-                    'Psychology/Research',
-                  ].map((career) => (
-                    <div key={career} className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-blue-200">
-                      <div className="w-2 h-2 rounded-full bg-blue-500" />
-                      <span className="text-foreground/80">{career}</span>
-                    </div>
-                  ))}
+
+              {careerData.best_fields?.length > 0 && (
+                <div className="bg-white/60 rounded-2xl p-6">
+                  <h3 className="font-display font-semibold text-foreground mb-3">Suitable Fields</h3>
+                  <div className="grid md:grid-cols-2 gap-3">
+                    {careerData.best_fields.map((field) => (
+                      <div key={field} className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-blue-200">
+                        <div className="w-2 h-2 rounded-full bg-blue-500" />
+                        <span className="text-foreground/80">{field}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </motion.div>
-        
-        {/* Strengths & Challenges */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-12"
-        >
+
+        {/* Personality Insights */}
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-12">
           <h2 className="text-3xl font-display font-bold text-foreground mb-6">Personality Insights</h2>
-          
+
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Strengths */}
             <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl border border-green-200 p-6 shadow-lg">
               <h3 className="font-display font-semibold text-foreground mb-4 flex items-center gap-2">
                 <Sparkles className="w-6 h-6 text-green-600" />
@@ -330,8 +296,7 @@ function ReportPage() {
                 ))}
               </ul>
             </div>
-            
-            {/* Challenges */}
+
             <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-3xl border border-amber-200 p-6 shadow-lg">
               <h3 className="font-display font-semibold text-foreground mb-4 flex items-center gap-2">
                 <TrendingUp className="w-6 h-6 text-amber-600" />
@@ -347,42 +312,6 @@ function ReportPage() {
                   </li>
                 ))}
               </ul>
-            </div>
-          </div>
-        </motion.div>
-        
-        {/* AI-Generated Insights */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-12"
-        >
-          <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-3xl border-2 border-primary/20 p-8 shadow-lg">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
-                <Sparkles className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-display font-bold text-foreground">AI Cosmic Guidance</h2>
-                <p className="text-foreground/70">Personalized insights from your AI astrology guide</p>
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              <blockquote className="border-l-4 border-primary pl-6 py-2">
-                <p className="text-foreground/90 leading-relaxed italic mb-2">
-                  "Your chart reveals a beautiful balance between mental brilliance and emotional depth. This is your superpower—
-                  you can think with your heart and feel with your mind. Embrace this duality rather than seeing it as contradiction."
-                </p>
-              </blockquote>
-              
-              <blockquote className="border-l-4 border-accent pl-6 py-2">
-                <p className="text-foreground/90 leading-relaxed italic mb-2">
-                  "The coming months bring powerful transits to your career sector. Jupiter's influence suggests expansion 
-                  and recognition. Trust your intuition when opportunities arise—your Pisces Moon knows the way."
-                </p>
-              </blockquote>
             </div>
           </div>
         </motion.div>

@@ -68,4 +68,53 @@ const generateAstroReading = async (prompt, options = {}) => {
   throw lastError;
 };
 
-module.exports = { generateAstroReading };
+/**
+ * Phase 3 — Grounded Gemini call.
+ *
+ * Sends a strict systemInstruction (the grounding contract) separately from
+ * the user-turn prompt, and uses low temperature for deterministic output.
+ *
+ * @param {string} userPrompt   - Domain evidence payload (from domainPrediction.buildDomainPrompt)
+ * @param {string} systemPrompt - GEMINI_SYSTEM_PROMPT grounding contract
+ * @param {Object} options      - Same options as generateAstroReading
+ * @returns {Promise<string>}   - Raw Gemini response text
+ */
+const generateGroundedReading = async (userPrompt, systemPrompt, options = {}) => {
+  let lastError;
+  const maxAttempts = options.maxAttempts || 2;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    for (const modelName of modelNames) {
+      try {
+        const model = genAI.getGenerativeModel({
+          model: modelName,
+          systemInstruction: systemPrompt,
+          generationConfig: options.generationConfig,
+        });
+
+        const result = await model.generateContent(userPrompt);
+
+        return result.response.text();
+      } catch (error) {
+        lastError = error;
+
+        if (!isRetryableModelError(error)) {
+          throw error;
+        }
+
+        console.warn(
+          `[GroundedReading] Model ${modelName} failed on attempt ${attempt}, trying fallback:`,
+          error.message
+        );
+      }
+    }
+
+    if (attempt < maxAttempts) {
+      await wait(1000 * attempt);
+    }
+  }
+
+  throw lastError;
+};
+
+module.exports = { generateAstroReading, generateGroundedReading };

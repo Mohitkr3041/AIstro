@@ -1,7 +1,8 @@
-const BirthDetails = require("../models/birth.model");
+﻿const BirthDetails = require("../models/birth.model");
 const ChatMessage = require("../models/chatMessage.model");
 const AstroReport = require("../models/report.model");
 const { generateAstroReading } = require("../services/gemini.service");
+const { prepareEvidenceOnly } = require("../services/astrology/prediction");
 
 const formatMessage = (message) => ({
   id: message._id,
@@ -75,6 +76,31 @@ const askAstroChat = async (req, res) => {
     }
 
     const { name, dob, tob, place } = birth;
+
+    // Phase 3 — Fetch deterministic Rule Engine evidence for grounding
+    let groundedEvidenceSummary = "";
+    try {
+      const { groundedEvidence } = await prepareEvidenceOnly({ dob, tob, place });
+      const meta = groundedEvidence.chartMetadata;
+
+      const domainLines = Object.entries(groundedEvidence.domainEvidence).map(([domain, ev]) => {
+        const top = (ev.topSupporting || []).slice(0, 3).map(f => `  - ${f.factor} [${f.strengthLanguage}]`).join("\n");
+        const contra = (ev.topContradicting || []).slice(0, 2).map(f => `  - ${f.factor} [${f.strengthLanguage}]`).join("\n");
+        return `${domain.toUpperCase()}: ${ev.netInfluenceLanguage}\nSupporting:\n${top || "  (none)"}${contra ? `\nChallenging:\n${contra}` : ""}`;
+      }).join("\n\n");
+
+      groundedEvidenceSummary = `
+AUTHORITATIVE DETERMINISTIC RULE ENGINE EVIDENCE (Use ONLY this for astrological facts):
+Chart: ${meta.ascendantSign} Ascendant, ${meta.sunSign} Sun, ${meta.moonSign} Moon, ${meta.moonNakshatra} Nakshatra
+
+${domainLines}
+
+SCORING DISCLAIMER: These are astrological evidence weights, NOT scientific probabilities.
+`.trim();
+    } catch (evidenceError) {
+      console.warn("[ChatController] Rule Engine evidence preparation warning:", evidenceError.message);
+    }
+
     const savedReport = await AstroReport.findOne({ userId }).sort({ updatedAt: -1 });
     const reportContext = compactReportContext(savedReport?.report);
     const recentMessages = await ChatMessage.find({ userId })
@@ -88,7 +114,12 @@ const askAstroChat = async (req, res) => {
     const prompt = `
 You are AIstro, a professional Vedic astrologer and modern life guide.
 
-The user is asking a follow-up question based on their birth details.
+STRICT GROUNDING RULES:
+- Use ONLY the authoritative Rule Engine evidence supplied below for all astrological claims.
+- Do NOT invent planetary placements, Yogas, Dasha periods, or transit predictions.
+- If the user asks about specific timing, Dasha, or transits that are not provided in the evidence, explicitly state that Dasha/transit calculations are unavailable rather than fabricating them.
+- Do NOT convert evidence scores into percentages or probabilities.
+- Do NOT make guaranteed predictions. Use "your chart suggests" or "astrological indicators point to".
 
 User birth details:
 - Name: ${name}
@@ -96,33 +127,22 @@ User birth details:
 - Time of Birth: ${tob}
 - Place of Birth: ${place}
 
+${groundedEvidenceSummary}
+
+${reportContext ? `Saved report context (supplementary reference only):\n${reportContext}` : ""}
+
 Recent conversation:
 ${conversationContext || "No previous messages."}
 
-Saved astrology report context:
-${reportContext || "No saved report context is available yet."}
-
-Question mode:
-${mode}
+Question mode: ${mode}
 
 User question:
 "${message}"
 
-Instructions:
-- Reply in simple, clear language
-- Be practical, warm, and positive
-- Answer from the saved astrology report context whenever available
-- If the saved report has relevant future, past, department, or remedy data, use that instead of giving generic advice
-- Follow the selected question mode if it is relevant
-- Give astrology-based guidance, but do not be fear-based or overly vague
-- Prefer 3 short bullets or 2 short paragraphs
-- End with one practical next step
-- Do not give medical, legal, financial, or emergency instructions
-- For serious health, money, legal, or safety concerns, suggest speaking with a qualified professional
-- Keep the answer conversational
-- Do not use markdown
-- Keep it under 200 words
-`;
+Reply in simple, clear language. Be practical and warm.
+Prefer 3 short bullets or 2 short paragraphs. End with one practical next step.
+Do not use markdown. Keep it under 200 words.
+`.trim();
 
     const reply = await generateAstroReading(prompt);
     const cleanedReply = reply.trim();
