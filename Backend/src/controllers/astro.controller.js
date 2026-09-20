@@ -4,7 +4,7 @@ const { generateAstroReading } = require("../services/gemini.service");
 const { calculateNatalChart } = require("../services/astrology/astrologyEngine");
 const { analyzeChart } = require("../services/astrology/rules/ruleEngine");
 // Phase 3 — Grounded Prediction Engine
-const { generateGroundedPredictions, prepareEvidenceOnly } = require("../services/astrology/prediction");
+const { generateGroundedPredictions, prepareEvidenceOnly, prepareGroundedEvidence } = require("../services/astrology/prediction");
 const crypto = require("crypto");
 
 const extractJsonObject = (text) => {
